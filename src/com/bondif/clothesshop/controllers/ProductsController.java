@@ -2,13 +2,14 @@ package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.GUITools;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.*;
 
 public class ProductsController {
     public static VBox getProductsPane() {
@@ -54,10 +55,21 @@ public class ProductsController {
     public static Pane getCreateForm() {
         GridPane gridPane = new GridPane();
 
-        String imagePath = "resources/admin.jpg";
+        gridPane.setAlignment(Pos.CENTER);
+//        gridPane.setStyle("-fx-border-width: 2px; -fx-border-style: solid; -fx-grid-lines-visible: true");
+
+        String imagePath = "resources/icons8-add-image-64.png";
         ImageView imageView = new ImageView(GUITools.getImage(imagePath));
-        imageView.setFitWidth(50);
+        imageView.setFitWidth(300);
         imageView.setPreserveRatio(true);
+
+        imageView.setOnMouseClicked(event -> {
+            if(event.getButton().equals(MouseButton.PRIMARY)) {
+                String newPath = AppController.chooseProductImageHandler();
+                if(newPath != null)
+                    imageView.setImage(GUITools.getImage(newPath));
+            }
+        });
 
         Label codeLabel = new Label("Code");
         Label labelLabel = new Label("Désignation");
@@ -75,19 +87,29 @@ public class ProductsController {
 
         Button submitBtn = new Button("Créer");
 
-        gridPane.add(imageView, 1,1, 2, 1);
+        gridPane.add(imageView, 0,0, 2, 1);
 
-        gridPane.add(codeLabel, 1, 2);
-        gridPane.add(labelLabel, 1, 3);
-        gridPane.add(buyPriceLabel, 1, 4);
-        gridPane.add(sellPriceLabel, 1, 5);
+        gridPane.add(codeLabel, 0, 1);
+        gridPane.add(labelLabel, 0, 2);
+        gridPane.add(buyPriceLabel, 0, 3);
+        gridPane.add(sellPriceLabel, 0, 4);
 
-        gridPane.add(codeTf, 2, 2);
-        gridPane.add(labelTf, 2, 3);
-        gridPane.add(buyPriceTf, 2, 4);
-        gridPane.add(sellPriceTf, 2, 5);
+        gridPane.add(codeTf, 1, 1);
+        gridPane.add(labelTf, 1, 2);
+        gridPane.add(buyPriceTf, 1, 3);
+        gridPane.add(sellPriceTf, 1, 4);
 
-        gridPane.add(submitBtn, 0, 6);
+        gridPane.add(submitBtn, 0, 5, 2, 1);
+
+        GridPane.setHalignment(imageView, HPos.CENTER);
+        GridPane.setHalignment(submitBtn, HPos.RIGHT);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(20);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(60);
+
+        gridPane.getColumnConstraints().addAll(col1, col2);
 
         gridPane.setHgap(10);
         gridPane.setVgap(10);
