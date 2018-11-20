@@ -1,7 +1,10 @@
 package com.bondif.clothesshop.controllers;
 
+import com.bondif.clothesshop.core.ProductDaoImpl;
 import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.GUITools;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,7 +15,17 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 
 public class ProductsController {
+    private static ObservableList<Product> productsOl;
+    private static ProductDaoImpl productDao;
+
+    static {
+        productDao = new ProductDaoImpl();
+    }
+
     public static VBox getProductsPane() {
+        // bring data from the server
+        productsOl = FXCollections.observableArrayList(productDao.findAll());
+
         VBox vBox = new VBox();
 
         // vbox config
@@ -39,13 +52,15 @@ public class ProductsController {
 
         // buyPrice column
         TableColumn<Product, Double> buyPriceColumn = new TableColumn<>("Prix d'achat");
-        buyPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyPrice"));
+        buyPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
 
         // sellPrice column
         TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
-        sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellPrice"));
+        sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
         productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn);
+
+        productsTableView.setItems(productsOl);
 
         vBox.getChildren().addAll(addBtn, productsTableView);
 

@@ -25,7 +25,7 @@ public class AppController {
     public static void launch(Stage stage) {
         AppController.stage = stage;
         configStage();
-        AppController.stage.setTitle("Cloths Shop");
+        AppController.stage.setTitle("Clothes Shop");
 
         Scene scene = new Scene(AppController.getRoot(), 1000, 600);
 
