@@ -5,6 +5,8 @@ import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -102,6 +104,16 @@ public class ProductsController {
 
         Button submitBtn = new Button("Créer");
 
+        submitBtn.setOnAction(event -> {
+            String label = labelTf.getText();
+            Double buyingPrice = Double.parseDouble(buyPriceTf.getText());
+            Double sellingPrice = Double.parseDouble(sellPriceTf.getText());
+            String image = imageView.getImage().getUrl();
+            addProductHandler(new Product(null, label, buyingPrice, sellingPrice, image));
+
+            AppController.showProducts();
+        });
+
         gridPane.add(imageView, 0,0, 2, 1);
 
         gridPane.add(codeLabel, 0, 1);
@@ -131,5 +143,9 @@ public class ProductsController {
 
 
         return gridPane;
+    }
+
+    public static void addProductHandler(Product product) {
+        productDao.create(product);
     }
 }

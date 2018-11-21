@@ -1,5 +1,6 @@
 package com.bondif.clothesshop.controllers;
 
+import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.GUIGenerator;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;

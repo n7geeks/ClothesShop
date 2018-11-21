@@ -1,13 +1,13 @@
 package com.bondif.clothesshop.models;
 
 public class Product {
-    private long code;
+    private Long code;
     private String label;
     private double buyingPrice;
     private double sellingPrice;
     private String image;
 
-    public Product(long code, String label, double buyingPrice, double sellingPrice, String image) {
+    public Product(Long code, String label, double buyingPrice, double sellingPrice, String image) {
         this.code = code;
         this.label = label;
         this.buyingPrice = buyingPrice;
@@ -15,7 +15,7 @@ public class Product {
         this.image = image;
     }
 
-    public long getCode() {
+    public Long getCode() {
         return code;
     }
 
@@ -35,7 +35,7 @@ public class Product {
         return image;
     }
 
-    public void setCode(long code) {
+    public void setCode(Long code) {
         this.code = code;
     }
 
