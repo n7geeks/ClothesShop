@@ -94,20 +94,45 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
             pstsmt.setDouble(2, product.getBuyingPrice());
             pstsmt.setDouble(3, product.getSellingPrice());
             pstsmt.setString(4, product.getImage());
-            pstsmt.executeUpdate();
+            pstsmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void update(Product entity) {
+    public void update(Product product) {
+        PreparedStatement pstmt;
 
+        String sql = "update products set label = ?, buyingPrice = ?, sellingPrice = ?, image = ?";
+
+        try {
+            pstmt = getConnection().prepareStatement(sql);
+
+            pstmt.setString(1, product.getLabel());
+            pstmt.setDouble(2, product.getBuyingPrice());
+            pstmt.setDouble(3, product.getSellingPrice());
+            pstmt.setString(4, product.getImage());
+
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void delete(Product entity) {
+    public void delete(Product product) {
+        PreparedStatement pstmt;
 
+        String sql = "delete from products where code = ?";
+
+        try {
+            pstmt = getConnection().prepareStatement(sql);
+            pstmt.setLong(1, product.getCode());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private String saveImage(String image) {

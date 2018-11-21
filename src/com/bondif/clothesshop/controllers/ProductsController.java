@@ -73,7 +73,7 @@ public class ProductsController {
         // Edit column
         TableColumn deleteColumn = new TableColumn<>("Supprimer");
         deleteColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Supprimer", (Product p) -> {
-            System.out.println("deleted");
+            ProductsController.deleteProductHandler(p);
             return p;
         }));
 
@@ -179,12 +179,20 @@ public class ProductsController {
     }
 
     public static void show(Long code) {
-        ProductDaoImpl productDao = new ProductDaoImpl();
         Product product = productDao.findOne(code);
 
         Pane pane = getProductPane(product);
 
         AppController.getRoot().setCenter(pane);
+    }
+
+    public static void editProductHandler(Product product) {
+
+    }
+
+    public static void deleteProductHandler(Product product) {
+        productDao.delete(product);
+        AppController.showProducts();
     }
 
     private static Pane getProductPane(Product product) {
