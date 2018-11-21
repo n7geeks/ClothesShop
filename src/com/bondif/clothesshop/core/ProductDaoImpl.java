@@ -51,8 +51,33 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
     }
 
     @Override
-    public Product findOne(long id) {
-        return null;
+    public Product findOne(long code) {
+        Product product = null;
+        String sql = "select * from products where code = ?";
+
+        PreparedStatement pstmt;
+        ResultSet rs;
+
+        try {
+            pstmt = getConnection().prepareStatement(sql);
+            pstmt.setLong(1, code);
+            rs = pstmt.executeQuery();
+            rs.next();
+            System.out.println(rs.getLong("code"));
+
+            long codeDb = rs.getLong("code");
+            String label = rs.getString("label");
+            double buyingPrice = rs.getDouble("buyingPrice");
+            double sellingPrice = rs.getDouble("sellingPrice");
+            String image = rs.getString("image");
+
+            product = new Product(codeDb, label, buyingPrice, sellingPrice, image);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return product;
     }
 
     @Override

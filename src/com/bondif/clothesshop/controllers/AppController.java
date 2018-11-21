@@ -16,7 +16,7 @@ public class AppController {
     private static Stage stage;
 
     static {
-        System.out.println("lance");
+        System.out.println("launched");
         root = new BorderPane();
 
         root.setLeft(GUIGenerator.getSideBar());

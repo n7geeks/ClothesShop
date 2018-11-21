@@ -5,16 +5,16 @@ import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 
 import java.io.File;
 import java.net.URI;
@@ -66,6 +66,18 @@ public class ProductsController {
         productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn);
 
         productsTableView.setItems(productsOl);
+
+        productsTableView.setRowFactory(tv -> {
+            TableRow<Product> productTableRow = new TableRow<>();
+
+            productTableRow.setOnMouseClicked(e -> {
+                if(e.getClickCount() == 2 && !productTableRow.isEmpty()) {
+                    ProductsController.show(productTableRow.getItem().getCode());
+                }
+            });
+
+            return productTableRow;
+        });
 
         vBox.getChildren().addAll(addBtn, productsTableView);
 
@@ -150,5 +162,58 @@ public class ProductsController {
 
     public static void addProductHandler(Product product) {
         productDao.create(product);
+    }
+
+    public static void show(Long code) {
+        ProductDaoImpl productDao = new ProductDaoImpl();
+        Product product = productDao.findOne(code);
+
+        Pane pane = getProductPane(product);
+
+        AppController.getRoot().setCenter(pane);
+    }
+
+    private static Pane getProductPane(Product product) {
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+//        gridPane.gridLinesVisibleProperty().setValue(true);
+
+        Text codeLabelTxt = new Text("Code");
+        Text labelLabelTxt = new Text("Label");
+        Text buyingPriceLabelTxt = new Text("Prix d'achat");
+        Text sellingPriceLabelTxt = new Text("Prix de vente");
+
+        ImageView imageView = new ImageView(GUITools.getImage(product.getImage()));
+        imageView.setFitWidth(250);
+        imageView.setPreserveRatio(true);
+        Text codeTxt = new Text(product.getCode().toString());
+        Text labelTxt = new Text(product.getLabel());
+        Text buyingPriceTxt = new Text(product.getBuyingPrice() + "");
+        Text sellingPriceTxt = new Text(product.getSellingPrice() + "");
+
+        gridPane.add(codeLabelTxt, 0, 1);
+        gridPane.add(labelLabelTxt, 0, 2);
+        gridPane.add(buyingPriceLabelTxt, 0, 3);
+        gridPane.add(sellingPriceLabelTxt, 0, 4);
+
+        gridPane.add(imageView, 0, 0, 2, 1);
+        gridPane.add(codeTxt, 1, 1);
+        gridPane.add(labelTxt, 1, 2);
+        gridPane.add(buyingPriceTxt, 1, 3);
+        gridPane.add(sellingPriceTxt, 1, 4);
+
+        GridPane.setHalignment(imageView, HPos.CENTER);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(20);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(60);
+
+        gridPane.getColumnConstraints().addAll(col1, col2);
+
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+
+        return gridPane;
     }
 }
