@@ -2,6 +2,7 @@ package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.core.ProductDaoImpl;
 import com.bondif.clothesshop.models.Product;
+import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,7 +11,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
@@ -40,7 +40,7 @@ public class ProductsController {
         // Add product button
         String iconPath = "resources/avatar.jpg";
         Button addBtn = GUITools.getButton(GUITools.getImage(iconPath), "Ajouter", 100);
-        addBtn.setOnAction(event ->  {
+        addBtn.setOnAction(event -> {
             AppController.showCreateProductForm();
         });
 
@@ -63,7 +63,21 @@ public class ProductsController {
         TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
         sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
-        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn);
+        // Edit column
+        TableColumn editColumn = new TableColumn<>("Modifier");
+        editColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Modifier", (Product p) -> {
+            System.out.println("updated");
+            return p;
+        }));
+
+        // Edit column
+        TableColumn deleteColumn = new TableColumn<>("Supprimer");
+        deleteColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Supprimer", (Product p) -> {
+            System.out.println("deleted");
+            return p;
+        }));
+
+        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, editColumn, deleteColumn);
 
         productsTableView.setItems(productsOl);
 
@@ -71,7 +85,7 @@ public class ProductsController {
             TableRow<Product> productTableRow = new TableRow<>();
 
             productTableRow.setOnMouseClicked(e -> {
-                if(e.getClickCount() == 2 && !productTableRow.isEmpty()) {
+                if (e.getClickCount() == 2 && !productTableRow.isEmpty()) {
                     ProductsController.show(productTableRow.getItem().getCode());
                 }
             });
@@ -96,9 +110,9 @@ public class ProductsController {
         imageView.setPreserveRatio(true);
 
         imageView.setOnMouseClicked(event -> {
-            if(event.getButton().equals(MouseButton.PRIMARY)) {
+            if (event.getButton().equals(MouseButton.PRIMARY)) {
                 String newPath = AppController.chooseProductImageHandler();
-                if(newPath != null)
+                if (newPath != null)
                     imageView.setImage(GUITools.getImage(newPath));
             }
         });
@@ -129,7 +143,7 @@ public class ProductsController {
             AppController.showProducts();
         });
 
-        gridPane.add(imageView, 0,0, 2, 1);
+        gridPane.add(imageView, 0, 0, 2, 1);
 
         gridPane.add(codeLabel, 0, 1);
         gridPane.add(labelLabel, 0, 2);
