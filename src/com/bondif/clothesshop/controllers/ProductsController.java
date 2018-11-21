@@ -16,6 +16,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 
+import java.io.File;
+import java.net.URI;
+
 public class ProductsController {
     private static ObservableList<Product> productsOl;
     private static ProductDaoImpl productDao;
@@ -108,7 +111,7 @@ public class ProductsController {
             String label = labelTf.getText();
             Double buyingPrice = Double.parseDouble(buyPriceTf.getText());
             Double sellingPrice = Double.parseDouble(sellPriceTf.getText());
-            String image = imageView.getImage().getUrl();
+            String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
             addProductHandler(new Product(null, label, buyingPrice, sellingPrice, image));
 
             AppController.showProducts();

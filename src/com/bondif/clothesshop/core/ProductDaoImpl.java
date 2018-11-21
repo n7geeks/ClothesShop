@@ -5,6 +5,8 @@ import com.bondif.clothesshop.models.Product;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -84,43 +86,18 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
     }
 
     private String saveImage(String image) {
-        File savedImage = new File(image.replace("file:/", ""));
-        System.out.println(convertToFileURL(image + "   .   "+ image.replace("file:\\", "")));
-        System.out.println(savedImage.toPath().toString());
-        if(savedImage.exists()) {
-            System.out.println("existe");
-        } else {
-            System.out.println("existe pas");
-        }
+        Path savedImage = Paths.get(image);
 
-        String newPath = "resources//images//products//" + new Date().getTime() + "_" + savedImage.getName();
-        File destImage = new File(newPath);
-        System.out.println(destImage.toURI());
+        String newPath = "resources/images/products/" + new Date().getTime() + "_" + savedImage.getFileName();
+        Path destImage = Paths.get(newPath);
 
         try {
-            Files.copy(savedImage.toPath(), destImage.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(savedImage, destImage, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
 
         return newPath;
-    }
-    private static String convertToFileURL ( String filename )
-    {
-        // On JDK 1.2 and later, simplify this to:
-        // "path = file.toURL().toString()".
-        String path = new File ( filename ).getAbsolutePath ();
-        if ( File.separatorChar != '/' )
-        {
-            path = path.replace ( File.separatorChar, '/' );
-        }
-        if ( !path.startsWith ( "/" ) )
-        {
-            path = "/" + path;
-        }
-        String retVal =  "file:" + path;
-
-        return retVal;
     }
 }
