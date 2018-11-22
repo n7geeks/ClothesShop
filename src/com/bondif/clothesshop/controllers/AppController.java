@@ -49,6 +49,15 @@ public class AppController {
         root.setCenter(pane);
     }
 
+    public static void showCategoryForm(){
+        Pane pane = CategoriesController.getCategoryForm();
+        root.setCenter(pane);
+    }
+    public static void showCreateCategoryForm(){
+        Pane pane = CategoriesController.getCreateCategoryForm();
+        root.setCenter(pane);
+    }
+
     public static BorderPane getRoot() {
         return root;
     }

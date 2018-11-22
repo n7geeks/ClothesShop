@@ -1,6 +1,8 @@
 package com.bondif.clothesshop.controllers;
 
+import com.bondif.clothesshop.core.CategoryDaoImpl;
 import com.bondif.clothesshop.core.ProductDaoImpl;
+import com.bondif.clothesshop.models.Category;
 import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
@@ -44,6 +46,12 @@ public class ProductsController {
             AppController.showCreateProductForm();
         });
 
+        //manage Categories
+        Button categoryBtn = GUITools.getButton(GUITools.getImage(iconPath), "catégories", 100);
+        categoryBtn.setOnAction(event ->  {
+            AppController.showCategoryForm();
+        });
+
         // Products Table
         TableView<Product> productsTableView = new TableView<>();
 
@@ -67,7 +75,7 @@ public class ProductsController {
 
         productsTableView.setItems(productsOl);
 
-        vBox.getChildren().addAll(addBtn, productsTableView);
+        vBox.getChildren().addAll(addBtn, categoryBtn, productsTableView);
 
         return vBox;
     }
