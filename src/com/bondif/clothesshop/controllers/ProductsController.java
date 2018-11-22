@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -66,7 +67,7 @@ public class ProductsController {
         // Edit column
         TableColumn editColumn = new TableColumn<>("Modifier");
         editColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Modifier", (Product p) -> {
-            System.out.println("updated");
+            ProductsController.editHandler(p);
             return p;
         }));
 
@@ -186,13 +187,49 @@ public class ProductsController {
         AppController.getRoot().setCenter(pane);
     }
 
-    public static void editProductHandler(Product product) {
-
+    public static void editHandler(Product product) {
+        Pane pane = getEditForm(product);
+        AppController.getRoot().setCenter(pane);
     }
 
     public static void deleteProductHandler(Product product) {
         productDao.delete(product);
         AppController.showProducts();
+    }
+
+    private static Pane getEditForm(Product product) {
+        GridPane gridPane = (GridPane)getCreateForm();
+
+        ImageView imageView = (ImageView) gridPane.getChildren().get(0);
+        imageView.setImage(GUITools.getImage(product.getImage()));
+
+        TextField codeTf = (TextField) gridPane.getChildren().get(5);
+        codeTf.setText(product.getCode().toString());
+
+        TextField labelTf = (TextField) gridPane.getChildren().get(6);
+        labelTf.setText(product.getLabel());
+
+        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(7);
+        buyingPriceTf.setText(product.getBuyingPrice() + "");
+
+        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(8);
+        sellingPriceTf.setText(product.getSellingPrice() + "");
+
+        Button updateButton = (Button) gridPane.getChildren().get(9);
+        updateButton.setText("Modifier");
+
+        updateButton.setOnAction(e -> {
+            long code = Long.parseLong(codeTf.getText());
+            String label = labelTf.getText();
+            double buyingPrice = Double.parseDouble(buyingPriceTf.getText());
+            double sellingPrice = Double.parseDouble(sellingPriceTf.getText());
+            String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
+
+            productDao.update(new Product(code, label, buyingPrice, sellingPrice, image));
+            AppController.getRoot().setCenter(getProductPane(productDao.findOne(product.getCode())));
+        });
+
+        return gridPane;
     }
 
     private static Pane getProductPane(Product product) {

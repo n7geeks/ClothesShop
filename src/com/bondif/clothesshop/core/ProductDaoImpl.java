@@ -104,7 +104,7 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
     public void update(Product product) {
         PreparedStatement pstmt;
 
-        String sql = "update products set label = ?, buyingPrice = ?, sellingPrice = ?, image = ?";
+        String sql = "update products set label = ?, buyingPrice = ?, sellingPrice = ?, image = ? where code = ?";
 
         try {
             pstmt = getConnection().prepareStatement(sql);
@@ -113,6 +113,7 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
             pstmt.setDouble(2, product.getBuyingPrice());
             pstmt.setDouble(3, product.getSellingPrice());
             pstmt.setString(4, product.getImage());
+            pstmt.setLong(5, product.getCode());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
