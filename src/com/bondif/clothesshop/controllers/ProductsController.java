@@ -4,19 +4,20 @@ import com.bondif.clothesshop.core.CategoryDaoImpl;
 import com.bondif.clothesshop.core.ProductDaoImpl;
 import com.bondif.clothesshop.models.Category;
 import com.bondif.clothesshop.models.Product;
+import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 
 import java.io.File;
 import java.net.URI;
@@ -42,7 +43,7 @@ public class ProductsController {
         // Add product button
         String iconPath = "resources/avatar.jpg";
         Button addBtn = GUITools.getButton(GUITools.getImage(iconPath), "Ajouter", 100);
-        addBtn.setOnAction(event ->  {
+        addBtn.setOnAction(event -> {
             AppController.showCreateProductForm();
         });
 
@@ -71,9 +72,35 @@ public class ProductsController {
         TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
         sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
-        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn);
+        // Edit column
+        TableColumn editColumn = new TableColumn<>("Modifier");
+        editColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Modifier", (Product p) -> {
+            ProductsController.editHandler(p);
+            return p;
+        }));
+
+        // Edit column
+        TableColumn deleteColumn = new TableColumn<>("Supprimer");
+        deleteColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Supprimer", (Product p) -> {
+            ProductsController.deleteProductHandler(p);
+            return p;
+        }));
+
+        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, editColumn, deleteColumn);
 
         productsTableView.setItems(productsOl);
+
+        productsTableView.setRowFactory(tv -> {
+            TableRow<Product> productTableRow = new TableRow<>();
+
+            productTableRow.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2 && !productTableRow.isEmpty()) {
+                    ProductsController.show(productTableRow.getItem().getCode());
+                }
+            });
+
+            return productTableRow;
+        });
 
         vBox.getChildren().addAll(addBtn, categoryBtn, productsTableView);
 
@@ -92,9 +119,9 @@ public class ProductsController {
         imageView.setPreserveRatio(true);
 
         imageView.setOnMouseClicked(event -> {
-            if(event.getButton().equals(MouseButton.PRIMARY)) {
+            if (event.getButton().equals(MouseButton.PRIMARY)) {
                 String newPath = AppController.chooseProductImageHandler();
-                if(newPath != null)
+                if (newPath != null)
                     imageView.setImage(GUITools.getImage(newPath));
             }
         });
@@ -125,7 +152,7 @@ public class ProductsController {
             AppController.showProducts();
         });
 
-        gridPane.add(imageView, 0,0, 2, 1);
+        gridPane.add(imageView, 0, 0, 2, 1);
 
         gridPane.add(codeLabel, 0, 1);
         gridPane.add(labelLabel, 0, 2);
@@ -158,5 +185,102 @@ public class ProductsController {
 
     public static void addProductHandler(Product product) {
         productDao.create(product);
+    }
+
+    public static void show(Long code) {
+        Product product = productDao.findOne(code);
+
+        Pane pane = getProductPane(product);
+
+        AppController.getRoot().setCenter(pane);
+    }
+
+    public static void editHandler(Product product) {
+        Pane pane = getEditForm(product);
+        AppController.getRoot().setCenter(pane);
+    }
+
+    public static void deleteProductHandler(Product product) {
+        productDao.delete(product);
+        AppController.showProducts();
+    }
+
+    private static Pane getEditForm(Product product) {
+        GridPane gridPane = (GridPane)getCreateForm();
+
+        ImageView imageView = (ImageView) gridPane.getChildren().get(0);
+        imageView.setImage(GUITools.getImage(product.getImage()));
+
+        TextField codeTf = (TextField) gridPane.getChildren().get(5);
+        codeTf.setText(product.getCode().toString());
+
+        TextField labelTf = (TextField) gridPane.getChildren().get(6);
+        labelTf.setText(product.getLabel());
+
+        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(7);
+        buyingPriceTf.setText(product.getBuyingPrice() + "");
+
+        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(8);
+        sellingPriceTf.setText(product.getSellingPrice() + "");
+
+        Button updateButton = (Button) gridPane.getChildren().get(9);
+        updateButton.setText("Modifier");
+
+        updateButton.setOnAction(e -> {
+            long code = Long.parseLong(codeTf.getText());
+            String label = labelTf.getText();
+            double buyingPrice = Double.parseDouble(buyingPriceTf.getText());
+            double sellingPrice = Double.parseDouble(sellingPriceTf.getText());
+            String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
+
+            productDao.update(new Product(code, label, buyingPrice, sellingPrice, image));
+            AppController.getRoot().setCenter(getProductPane(productDao.findOne(product.getCode())));
+        });
+
+        return gridPane;
+    }
+
+    private static Pane getProductPane(Product product) {
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+//        gridPane.gridLinesVisibleProperty().setValue(true);
+
+        Text codeLabelTxt = new Text("Code");
+        Text labelLabelTxt = new Text("Label");
+        Text buyingPriceLabelTxt = new Text("Prix d'achat");
+        Text sellingPriceLabelTxt = new Text("Prix de vente");
+
+        ImageView imageView = new ImageView(GUITools.getImage(product.getImage()));
+        imageView.setFitWidth(250);
+        imageView.setPreserveRatio(true);
+        Text codeTxt = new Text(product.getCode().toString());
+        Text labelTxt = new Text(product.getLabel());
+        Text buyingPriceTxt = new Text(product.getBuyingPrice() + "");
+        Text sellingPriceTxt = new Text(product.getSellingPrice() + "");
+
+        gridPane.add(codeLabelTxt, 0, 1);
+        gridPane.add(labelLabelTxt, 0, 2);
+        gridPane.add(buyingPriceLabelTxt, 0, 3);
+        gridPane.add(sellingPriceLabelTxt, 0, 4);
+
+        gridPane.add(imageView, 0, 0, 2, 1);
+        gridPane.add(codeTxt, 1, 1);
+        gridPane.add(labelTxt, 1, 2);
+        gridPane.add(buyingPriceTxt, 1, 3);
+        gridPane.add(sellingPriceTxt, 1, 4);
+
+        GridPane.setHalignment(imageView, HPos.CENTER);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(20);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(60);
+
+        gridPane.getColumnConstraints().addAll(col1, col2);
+
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+
+        return gridPane;
     }
 }
