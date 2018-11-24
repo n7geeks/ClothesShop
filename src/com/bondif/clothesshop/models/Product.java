@@ -6,6 +6,7 @@ public class Product {
     private double buyingPrice;
     private double sellingPrice;
     private String image;
+    private Category category;
 
     public Product(Long code, String label, double buyingPrice, double sellingPrice, String image) {
         this.code = code;
@@ -13,6 +14,15 @@ public class Product {
         this.buyingPrice = buyingPrice;
         this.sellingPrice = sellingPrice;
         this.image = image;
+    }
+
+    public Product(Long code, String label, double buyingPrice, double sellingPrice, String image, Category category) {
+        this.code = code;
+        this.label = label;
+        this.buyingPrice = buyingPrice;
+        this.sellingPrice = sellingPrice;
+        this.image = image;
+        this.category = category;
     }
 
     public Long getCode() {
@@ -35,6 +45,10 @@ public class Product {
         return image;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
     public void setCode(Long code) {
         this.code = code;
     }
@@ -53,5 +67,9 @@ public class Product {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

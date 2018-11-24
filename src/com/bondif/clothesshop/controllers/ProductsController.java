@@ -72,6 +72,10 @@ public class ProductsController {
         TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
         sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
+        // category column
+        TableColumn<Product, Category> categoryColumn = new TableColumn<>("Categorie");
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
         // Edit column
         TableColumn editColumn = new TableColumn<>("Modifier");
         editColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Modifier", (Product p) -> {
@@ -79,14 +83,14 @@ public class ProductsController {
             return p;
         }));
 
-        // Edit column
+        // Delete column
         TableColumn deleteColumn = new TableColumn<>("Supprimer");
         deleteColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Supprimer", (Product p) -> {
             ProductsController.deleteProductHandler(p);
             return p;
         }));
 
-        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, editColumn, deleteColumn);
+        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, categoryColumn, editColumn, deleteColumn);
 
         productsTableView.setItems(productsOl);
 

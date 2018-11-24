@@ -53,6 +53,7 @@ public class AppController {
         Pane pane = CategoriesController.getCategoryForm();
         root.setCenter(pane);
     }
+
     public static void showCreateCategoryForm(){
         Pane pane = CategoriesController.getCreateCategoryForm();
         root.setCenter(pane);

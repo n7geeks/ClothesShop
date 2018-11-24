@@ -1,5 +1,6 @@
 package com.bondif.clothesshop.core;
 
+import com.bondif.clothesshop.models.Category;
 import com.bondif.clothesshop.models.Product;
 
 import java.io.File;
@@ -24,7 +25,9 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
 
     @Override
     public Collection<Product> findAll() {
+        CategoryDaoImpl categoryDao = new CategoryDaoImpl();
         Collection<Product> products = new LinkedList<>();
+        Collection<Category> categories = categoryDao.findAll();
         String sql = "select * from products";
         PreparedStatement pstmt;
         ResultSet rs;
@@ -39,8 +42,10 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
                 double buyingPrice = rs.getDouble("buyingPrice");
                 double sellingPrice = rs.getDouble("sellingPrice");
                 String image = rs.getString("image");
+                long category_id = rs.getLong("category_id");
+                Category category = getCategoryById(categories, category_id);
 
-                Product p = new Product(code, label, buyingPrice, sellingPrice, image);
+                Product p = new Product(code, label, buyingPrice, sellingPrice, image, category);
                 products.add(p);
             }
         } catch (SQLException e) {
@@ -150,5 +155,14 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
         }
 
         return newPath;
+    }
+
+    private Category getCategoryById(Collection<Category> categories, long category_id) {
+        for (Category category: categories) {
+            if(category.getId() == category_id) {
+                return category;
+            }
+        }
+        return null;
     }
 }
