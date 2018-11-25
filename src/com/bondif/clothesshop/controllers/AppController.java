@@ -23,11 +23,15 @@ public class AppController {
         root.setTop(GUIGenerator.getTopBar());
     }
 
+    public static Stage getStage(){
+        return stage;
+    }
+
     public static void launch(Stage stage) {
         AppController.stage = stage;
         configStage();
         AppController.stage.setTitle("Clothes Shop");
-
+        configStage();
         Scene scene = new Scene(AppController.getRoot(), 1000, 600);
 
         AppController.stage.setScene(scene);
@@ -46,6 +50,21 @@ public class AppController {
 
     public static void showCreateProductForm() {
         Pane pane = ProductsController.getCreateForm();
+        root.setCenter(pane);
+    }
+
+    public static void showCustomers(){
+        Pane pane = CustomersController.createCustomerPane();
+        root.setCenter(pane);
+    }
+
+    public static void showCreateCustomerForm(){
+        Pane pane = CustomersController.getCustomerPane();
+        root.setCenter(pane);
+    }
+
+    public static void showEditCustomerForm(){
+        Pane pane = CustomersController.getEditPane();
         root.setCenter(pane);
     }
 
@@ -69,6 +88,6 @@ public class AppController {
     }
 
     private static void configStage() {
-//        stage.initStyle(StageStyle.UNDECORATED);
+        stage.initStyle(StageStyle.UNDECORATED);
     }
 }

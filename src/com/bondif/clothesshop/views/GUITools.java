@@ -1,6 +1,7 @@
 package com.bondif.clothesshop.views;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,5 +26,13 @@ public class GUITools {
         button.setAlignment(Pos.CENTER_LEFT);
 
         return button;
+    }
+
+    public static Alert messageBox (Alert.AlertType type, String title, String header, String content){
+        Alert msgBox = new Alert(type);
+        msgBox.setTitle(title);
+        msgBox.setHeaderText(header);
+        msgBox.setContentText(content);
+        return msgBox;
     }
 }
