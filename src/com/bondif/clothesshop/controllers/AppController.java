@@ -44,6 +44,11 @@ public class AppController {
         root.setCenter(pane);
     }
 
+    public static void showSales() {
+        Pane pane = SalesController.getSalesPane();
+        root.setCenter(pane);
+    }
+
     public static void showCreateProductForm() {
         Pane pane = ProductsController.getCreateForm();
         root.setCenter(pane);
@@ -56,6 +61,11 @@ public class AppController {
 
     public static void showCreateCategoryForm(){
         Pane pane = CategoriesController.getCreateCategoryForm();
+        root.setCenter(pane);
+    }
+
+    public static void showSaleCreateForm() {
+        Pane pane = SalesController.getCreateForm();
         root.setCenter(pane);
     }
 

@@ -42,6 +42,10 @@ public class GUIGenerator {
             AppController.showProducts();
         });
 
+        sellsBtn.setOnAction(event ->  {
+            AppController.showSales();
+        });
+
         sideBar.getChildren().add(adminPart);
         sideBar.getChildren().addAll(dashboardBtn, productsBtn, clientsBtn, sellsBtn);
 
