@@ -80,7 +80,7 @@ public class CategoriesController {
 */
         //id column
         TableColumn<Category, Long> idColumn = new TableColumn<>("id");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("idCategory"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         idColumn.setMinWidth(200);
         //id column
         TableColumn<Category, String> titleColumn = new TableColumn<>("catégorie");

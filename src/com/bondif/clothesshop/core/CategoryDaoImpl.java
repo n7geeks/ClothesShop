@@ -74,7 +74,7 @@ public class CategoryDaoImpl extends AbstractDao implements Dao<Category> {
                     .replace("%", "!%")
                     .replace("_", "!_")
                     .replace("[", "![");
-            pstmt.setString(1, start+"%");
+            pstmt.setString(1, "%"+start+"%");
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
