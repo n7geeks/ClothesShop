@@ -17,6 +17,15 @@ public class Product {
         this.category = category;
     }
 
+    public Product() {
+        this.code = 0L;
+        this.label = "";
+        this.buyingPrice = 0.0;
+        this.sellingPrice = 0.0;
+        this.image = "";
+        this.category = null;
+    }
+
     public Long getCode() {
         return code;
     }

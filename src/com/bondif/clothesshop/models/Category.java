@@ -13,6 +13,11 @@ public class Category {
         this.title = title;
     }
 
+    public Category() {
+        this.id = 0L;
+        this.title = "";
+    }
+
     public Long getId() {
         return id;
     }

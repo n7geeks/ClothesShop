@@ -31,7 +31,7 @@ public class ProductsController {
 
     public static VBox getProductsPane() {
         // bring data from the server
-        productsOl = FXCollections.observableArrayList(productDao.findAll());
+        productsOl = getProductsOl();
 
         VBox vBox = new VBox();
 
@@ -53,27 +53,7 @@ public class ProductsController {
         });
 
         // Products Table
-        TableView<Product> productsTableView = new TableView<>();
-
-        // code column
-        TableColumn<Product, Long> codeColumn = new TableColumn<>("Code");
-        codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
-
-        // label column
-        TableColumn<Product, String> labelColumn = new TableColumn<>("Désignation");
-        labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
-
-        // buyPrice column
-        TableColumn<Product, Double> buyPriceColumn = new TableColumn<>("Prix d'achat");
-        buyPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
-
-        // sellPrice column
-        TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
-        sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
-
-        // category column
-        TableColumn<Product, Category> categoryColumn = new TableColumn<>("Categorie");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+        TableView<Product> productsTableView = getBasicTableView();
 
         // Edit column
         TableColumn editColumn = new TableColumn<>("Modifier");
@@ -89,7 +69,7 @@ public class ProductsController {
             return p;
         }));
 
-        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, categoryColumn, editColumn, deleteColumn);
+        productsTableView.getColumns().addAll(editColumn, deleteColumn);
 
         productsTableView.setItems(productsOl);
 
@@ -213,6 +193,39 @@ public class ProductsController {
     public static void deleteProductHandler(Product product) {
         productDao.delete(product);
         AppController.showProducts();
+    }
+
+    public static TableView<Product> getBasicTableView() {
+        // Products Table
+        TableView<Product> productsTableView = new TableView<>();
+
+        // code column
+        TableColumn<Product, Long> codeColumn = new TableColumn<>("Code");
+        codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
+
+        // label column
+        TableColumn<Product, String> labelColumn = new TableColumn<>("Désignation");
+        labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
+
+        // buyPrice column
+        TableColumn<Product, Double> buyPriceColumn = new TableColumn<>("Prix d'achat");
+        buyPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
+
+        // sellPrice column
+        TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
+        sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+
+        // category column
+        TableColumn<Product, Category> categoryColumn = new TableColumn<>("Categorie");
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, categoryColumn);
+
+        return productsTableView;
+    }
+
+    public static ObservableList<Product> getProductsOl() {
+        return FXCollections.observableArrayList(productDao.findAll());
     }
 
     private static Pane getEditForm(Product product) {

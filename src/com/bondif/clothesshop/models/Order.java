@@ -1,21 +1,23 @@
 package com.bondif.clothesshop.models;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
-public class Sale {
+public class Order {
     private long id;
     private String customer;
     private double total;
     private LocalDateTime createdAt;
+    private Collection<OrderLine> orderLines;
 
-    public Sale(long id, String customer, double total, LocalDateTime createdAt) {
+    public Order(long id, String customer, double total, LocalDateTime createdAt) {
         this.id = id;
         this.customer = customer;
         this.total = total;
         this.createdAt = createdAt;
     }
 
-    public Sale() {
+    public Order() {
         this.id = 0;
         this.customer = "";
         this.total = 0;
