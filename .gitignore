@@ -1,3 +1,6 @@
 ﻿.idea
 *.iml
 out
+out
+/bin/
+resouces/images/

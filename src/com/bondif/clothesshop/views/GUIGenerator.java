@@ -1,9 +1,6 @@
 package com.bondif.clothesshop.views;
 
 import com.bondif.clothesshop.controllers.AppController;
-import com.bondif.clothesshop.controllers.DashboardController;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -56,6 +53,11 @@ public class GUIGenerator {
         clientsBtn.setOnAction(event -> {
             AppController.showCustomers();
         });
+
+        sellsBtn.setOnAction(event ->  {
+            AppController.showSales();
+        });
+
         sideBar.getChildren().add(adminPart);
         sideBar.getChildren().addAll(dashboardBtn, productsBtn, clientsBtn, sellsBtn);
 

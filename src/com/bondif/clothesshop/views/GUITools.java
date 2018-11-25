@@ -3,8 +3,13 @@ package com.bondif.clothesshop.views;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import java.text.ParseException;
+import java.util.Optional;
 
 import java.io.File;
 
@@ -34,5 +39,57 @@ public class GUITools {
         msgBox.setHeaderText(header);
         msgBox.setContentText(content);
         return msgBox;
+    }
+
+    public static boolean openDialogYesNo(String title, String header, String message, Alert.AlertType at) {
+        Alert alert = new Alert(at);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+
+        ButtonType buttonTypeOne = new ButtonType("Oui");
+        ButtonType buttonTypeTwo = new ButtonType("Non");
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.get() == buttonTypeOne;
+    }
+
+    public static boolean openDialogOk(String title, String header, String message, Alert.AlertType at) {
+        Alert alert = new Alert(at);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+
+        ButtonType buttonTypeTwo = new ButtonType("Ok");
+
+        alert.getButtonTypes().setAll(buttonTypeTwo);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return true;
+    }
+
+    public static int openQtyTextInputDialog() {
+        TextInputDialog dialog = new TextInputDialog("1");
+        dialog.setTitle("Quantité");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Entrer la quantité : ");
+
+        while(true) {
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                try {
+                    int qty = Integer.parseInt(result.get());
+                    if(qty == 0) continue;
+
+                    return qty;
+                } catch (NumberFormatException e) {
+                    // nothing
+                }
+            } else break;
+        }
+
+        return -1;
     }
 }
