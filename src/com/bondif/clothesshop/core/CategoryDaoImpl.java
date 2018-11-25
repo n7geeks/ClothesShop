@@ -99,7 +99,7 @@ public class CategoryDaoImpl extends AbstractDao implements Dao<Category> {
         try {
             pstsmt = getConnection().prepareStatement(query);
             pstsmt.setString(1, entity.getTitle());
-            pstsmt.setLong(2, entity.getIdCategory());
+            pstsmt.setLong(2, entity.getId());
 
 
             pstsmt.executeUpdate();
@@ -115,7 +115,7 @@ public class CategoryDaoImpl extends AbstractDao implements Dao<Category> {
         String query = "delete from categories where id = ?";
         try {
             pstsmt = getConnection().prepareStatement(query);
-            pstsmt.setLong(1, entity.getIdCategory());
+            pstsmt.setLong(1, entity.getId());
 
             pstsmt.executeUpdate();
         } catch (SQLException e) {

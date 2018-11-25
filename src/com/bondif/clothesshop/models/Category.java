@@ -1,7 +1,7 @@
 package com.bondif.clothesshop.models;
 
 public class Category {
-    private Long idCategory;
+    private Long id;
     private String title;
 
     public Category(String title) {
@@ -9,16 +9,16 @@ public class Category {
     }
 
     public Category(Long idCategory, String title) {
-        this.idCategory = idCategory;
+        this.id = idCategory;
         this.title = title;
     }
 
-    public Long getIdCategory() {
-        return idCategory;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdCategory(Long idCategory) {
-        this.idCategory = idCategory;
+    public void setId(Long idCategory) {
+        this.id = idCategory;
     }
 
     public String getTitle() {
@@ -27,5 +27,10 @@ public class Category {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 }

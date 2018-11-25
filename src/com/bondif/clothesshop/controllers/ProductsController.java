@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -72,6 +71,10 @@ public class ProductsController {
         TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
         sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
+        // category column
+        TableColumn<Product, Category> categoryColumn = new TableColumn<>("Categorie");
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
         // Edit column
         TableColumn editColumn = new TableColumn<>("Modifier");
         editColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Modifier", (Product p) -> {
@@ -79,14 +82,14 @@ public class ProductsController {
             return p;
         }));
 
-        // Edit column
+        // Delete column
         TableColumn deleteColumn = new TableColumn<>("Supprimer");
         deleteColumn.setCellFactory(ActionButtonTableCell.forTableColumn("Supprimer", (Product p) -> {
             ProductsController.deleteProductHandler(p);
             return p;
         }));
 
-        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, editColumn, deleteColumn);
+        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, categoryColumn, editColumn, deleteColumn);
 
         productsTableView.setItems(productsOl);
 
@@ -130,8 +133,10 @@ public class ProductsController {
         Label labelLabel = new Label("Désignation");
         Label buyPriceLabel = new Label("Prix d'achat");
         Label sellPriceLabel = new Label("Prix de vente");
+        Label categoryLabel = new Label("Catégorie");
 
         TextField codeTf = new TextField();
+        codeTf.setDisable(true);
         codeTf.setPromptText("Code");
         TextField labelTf = new TextField();
         labelTf.setPromptText("Désignation");
@@ -139,6 +144,7 @@ public class ProductsController {
         buyPriceTf.setPromptText("Prix d'achat");
         TextField sellPriceTf = new TextField();
         sellPriceTf.setPromptText("Prix de vente");
+        ComboBox<Category> categoriesCb = new ComboBox<>(FXCollections.observableArrayList(new CategoryDaoImpl().findAll()));
 
         Button submitBtn = new Button("Créer");
 
@@ -147,7 +153,9 @@ public class ProductsController {
             Double buyingPrice = Double.parseDouble(buyPriceTf.getText());
             Double sellingPrice = Double.parseDouble(sellPriceTf.getText());
             String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
-            addProductHandler(new Product(null, label, buyingPrice, sellingPrice, image));
+            Category category = categoriesCb.getValue();
+
+            addProductHandler(new Product(null, label, buyingPrice, sellingPrice, image, category));
 
             AppController.showProducts();
         });
@@ -158,13 +166,15 @@ public class ProductsController {
         gridPane.add(labelLabel, 0, 2);
         gridPane.add(buyPriceLabel, 0, 3);
         gridPane.add(sellPriceLabel, 0, 4);
+        gridPane.add(categoryLabel, 0, 5);
 
         gridPane.add(codeTf, 1, 1);
         gridPane.add(labelTf, 1, 2);
         gridPane.add(buyPriceTf, 1, 3);
         gridPane.add(sellPriceTf, 1, 4);
+        gridPane.add(categoriesCb, 1, 5);
 
-        gridPane.add(submitBtn, 0, 5, 2, 1);
+        gridPane.add(submitBtn, 0, 6, 2, 1);
 
         GridPane.setHalignment(imageView, HPos.CENTER);
         GridPane.setHalignment(submitBtn, HPos.RIGHT);
@@ -211,19 +221,22 @@ public class ProductsController {
         ImageView imageView = (ImageView) gridPane.getChildren().get(0);
         imageView.setImage(GUITools.getImage(product.getImage()));
 
-        TextField codeTf = (TextField) gridPane.getChildren().get(5);
+        TextField codeTf = (TextField) gridPane.getChildren().get(6);
         codeTf.setText(product.getCode().toString());
 
-        TextField labelTf = (TextField) gridPane.getChildren().get(6);
+        TextField labelTf = (TextField) gridPane.getChildren().get(7);
         labelTf.setText(product.getLabel());
 
-        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(7);
+        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(8);
         buyingPriceTf.setText(product.getBuyingPrice() + "");
 
-        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(8);
+        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(9);
         sellingPriceTf.setText(product.getSellingPrice() + "");
 
-        Button updateButton = (Button) gridPane.getChildren().get(9);
+        ComboBox<Category> categoriesCb = (ComboBox<Category>) gridPane.getChildren().get(10);
+        categoriesCb.setValue(product.getCategory());
+
+        Button updateButton = (Button) gridPane.getChildren().get(11);
         updateButton.setText("Modifier");
 
         updateButton.setOnAction(e -> {
@@ -232,8 +245,9 @@ public class ProductsController {
             double buyingPrice = Double.parseDouble(buyingPriceTf.getText());
             double sellingPrice = Double.parseDouble(sellingPriceTf.getText());
             String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
+            Category category = categoriesCb.getValue();
 
-            productDao.update(new Product(code, label, buyingPrice, sellingPrice, image));
+            productDao.update(new Product(code, label, buyingPrice, sellingPrice, image, category));
             AppController.getRoot().setCenter(getProductPane(productDao.findOne(product.getCode())));
         });
 
@@ -249,6 +263,7 @@ public class ProductsController {
         Text labelLabelTxt = new Text("Label");
         Text buyingPriceLabelTxt = new Text("Prix d'achat");
         Text sellingPriceLabelTxt = new Text("Prix de vente");
+        Text categoryLabelTxt = new Text("Catégorie");
 
         ImageView imageView = new ImageView(GUITools.getImage(product.getImage()));
         imageView.setFitWidth(250);
@@ -257,17 +272,20 @@ public class ProductsController {
         Text labelTxt = new Text(product.getLabel());
         Text buyingPriceTxt = new Text(product.getBuyingPrice() + "");
         Text sellingPriceTxt = new Text(product.getSellingPrice() + "");
+        Text categoryTxt = new Text(product.getCategory().getTitle());
 
         gridPane.add(codeLabelTxt, 0, 1);
         gridPane.add(labelLabelTxt, 0, 2);
         gridPane.add(buyingPriceLabelTxt, 0, 3);
         gridPane.add(sellingPriceLabelTxt, 0, 4);
+        gridPane.add(categoryLabelTxt, 0, 5);
 
         gridPane.add(imageView, 0, 0, 2, 1);
         gridPane.add(codeTxt, 1, 1);
         gridPane.add(labelTxt, 1, 2);
         gridPane.add(buyingPriceTxt, 1, 3);
         gridPane.add(sellingPriceTxt, 1, 4);
+        gridPane.add(categoryTxt, 1, 5);
 
         GridPane.setHalignment(imageView, HPos.CENTER);
 
