@@ -60,6 +60,37 @@ public class CategoryDaoImpl extends AbstractDao implements Dao<Category> {
         }
     }
 
+    public Collection<Category> findAll(String start) {
+        if(start.trim().equals("") )return findAll();
+        Collection<Category> categories = new LinkedList<>();
+        String sql = "select * from categories where title Like ? ESCAPE  '!'";
+        PreparedStatement pstmt;
+        ResultSet rs;
+
+        try {
+            pstmt = getConnection().prepareStatement(sql);
+
+            start = start.replace("!", "!!")
+                    .replace("%", "!%")
+                    .replace("_", "!_")
+                    .replace("[", "![");
+            pstmt.setString(1, start+"%");
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                long idcat = rs.getLong("id");
+                String titlecat= rs.getString("title");
+
+                Category c = new Category(idcat, titlecat);
+                categories.add(c);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categories;
+    }
+
     @Override
     public void update(Category entity) {
         PreparedStatement pstsmt;
