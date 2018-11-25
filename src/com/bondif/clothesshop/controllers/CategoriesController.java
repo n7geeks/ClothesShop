@@ -58,6 +58,26 @@ public class CategoriesController {
             AppController.showCreateCategoryForm();
         });
 
+        TextField tfsearch = new TextField("");
+        tfsearch.setMinWidth(300);
+        tfsearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            categoriesOl =FXCollections.observableArrayList(categoryDao.findAll(newValue));
+            categoriesTableView.setItems(categoriesOl);
+        });
+
+        GridPane littleWrapper = new GridPane();
+        littleWrapper.setHgap(40);
+        littleWrapper.setVgap(10);
+
+        littleWrapper.add(bnajouter, 0, 0);
+        littleWrapper.add(tfsearch, 1, 0);
+        //GridPane.setHalignment(tfsearch, HPos.CENTER);
+        /*ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(10);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(50);
+        littleWrapper.getColumnConstraints().addAll(column1, column2);
+*/
         //id column
         TableColumn<Category, Long> idColumn = new TableColumn<>("id");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("idCategory"));
@@ -140,7 +160,7 @@ public class CategoriesController {
 
 
 //      catform.getChildren().addAll(addBtn, productsTableView);
-        catform.getChildren().addAll(bnajouter, categoriesTableView, gp_alter);
+        catform.getChildren().addAll(littleWrapper, categoriesTableView, gp_alter);
 
         return catform;
 
