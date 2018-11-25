@@ -15,11 +15,12 @@ public class OrderLinesController {
 
     static {
         orderLineDao = new OrderLineDaoImpl();
+        orderLinesOl = null;
     }
 
     public static TableView<OrderLine> getBasicTableView() {
         TableView<OrderLine> orderLinesTv = new TableView<>();
-        orderLinesOl = FXCollections.observableArrayList();
+        orderLinesOl = getOrderLinesOl();
 
         // price column
         TableColumn<OrderLine, Double> priceCol = new TableColumn<>("Prix");
@@ -44,5 +45,9 @@ public class OrderLinesController {
 
     public static void add(OrderLine orderLine) {
         orderLinesOl.add(orderLine);
+    }
+
+    public static ObservableList<OrderLine> getOrderLinesOl() {
+        return orderLinesOl == null ? FXCollections.observableArrayList() : orderLinesOl;
     }
 }

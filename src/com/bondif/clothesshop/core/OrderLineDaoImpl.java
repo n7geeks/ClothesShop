@@ -73,8 +73,20 @@ public class OrderLineDaoImpl extends AbstractDao implements Dao<OrderLine> {
     }
 
     @Override
-    public void create(OrderLine entity) {
+    public void create(OrderLine orderLine) {
+        PreparedStatement pstsmt;
 
+        String query = "INSERT INTO order_lines VALUES (NULL, ?, ?, ?, ?)";
+        try {
+            pstsmt = getConnection().prepareStatement(query);
+            pstsmt.setLong(1, orderLine.getProduct().getCode());
+            pstsmt.setLong(2, orderLine.getOrder().getId());
+            pstsmt.setInt(3, orderLine.getQty());
+            pstsmt.setDouble(4, orderLine.getPrice());
+            pstsmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

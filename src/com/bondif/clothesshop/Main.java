@@ -11,7 +11,6 @@ public class Main extends Application {
         AppController.launch(primaryStage);
     }
 
-
     public static void main(String[] args) {
         launch();
     }

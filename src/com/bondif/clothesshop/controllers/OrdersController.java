@@ -1,6 +1,8 @@
 package com.bondif.clothesshop.controllers;
 
+import com.bondif.clothesshop.core.CustomerDaoImpl;
 import com.bondif.clothesshop.core.OrderDaoImpl;
+import com.bondif.clothesshop.models.Customer;
 import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.models.OrderLine;
 import com.bondif.clothesshop.models.Product;
@@ -16,11 +18,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class OrdersController {
     private static ObservableList<Order> ordersOl;
     private static OrderDaoImpl orderDao;
+    private static ComboBox<Customer> customersCb;
 
     static {
         orderDao = new OrderDaoImpl();
@@ -89,17 +93,24 @@ public class OrdersController {
         Pane productsSection = getProductsSection();
         Pane orderLinesSection = getOrderLinesSection();
         Pane clientSection = getClientSection();
+        Pane submitBtnSection = getSubmitBtnSection();
 
         gPane.add(productsSection, 0, 0);
         gPane.add(orderLinesSection, 0, 1);
         gPane.add(clientSection, 0, 2);
+        gPane.add(submitBtnSection, 0, 3);
 
         return gPane;
     }
 
     private static Pane getClientSection() {
+        CustomerDaoImpl customerDao = new CustomerDaoImpl();
         HBox hBox = new HBox();
-        return new VBox();
+        Label clientLabel = new Label("Client : ");
+        customersCb = new ComboBox<>(FXCollections.observableArrayList(customerDao.findAll()));
+        hBox.getChildren().addAll(clientLabel, customersCb);
+
+        return new VBox(hBox);
     }
 
     private static Pane getOrderLinesSection() {
@@ -125,6 +136,21 @@ public class OrdersController {
         productsTv.setItems(ProductsController.getProductsOl());
 
         return new VBox(productsTv);
+    }
+
+    private static Pane getSubmitBtnSection() {
+        Button submitBtn = GUITools.getButton(null, "Passer la commande", 70);
+
+        submitBtn.setOnAction(event -> {
+            double sum = 0;
+            for (OrderLine orderLine: OrderLinesController.getOrderLinesOl()) {
+                sum += orderLine.getTotal();
+            }
+            orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl()));
+            AppController.showSales();
+        });
+
+        return new HBox(submitBtn);
     }
 
     public static void show(long id) {

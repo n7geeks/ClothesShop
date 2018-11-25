@@ -17,4 +17,8 @@ public final class Tools {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
+
+    public static java.sql.Date toDate(LocalDateTime dateTime) {
+        return new java.sql.Date(dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+    }
 }
