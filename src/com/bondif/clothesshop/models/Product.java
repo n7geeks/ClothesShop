@@ -8,14 +8,6 @@ public class Product {
     private String image;
     private Category category;
 
-    public Product(Long code, String label, double buyingPrice, double sellingPrice, String image) {
-        this.code = code;
-        this.label = label;
-        this.buyingPrice = buyingPrice;
-        this.sellingPrice = sellingPrice;
-        this.image = image;
-    }
-
     public Product(Long code, String label, double buyingPrice, double sellingPrice, String image, Category category) {
         this.code = code;
         this.label = label;
