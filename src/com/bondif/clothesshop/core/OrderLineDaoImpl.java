@@ -21,7 +21,7 @@ public class OrderLineDaoImpl extends AbstractDao implements Dao<OrderLine> {
     public Collection<OrderLine> findAll(Order order) {
         Collection<OrderLine> orderLines = new LinkedList<>();
         String sql = "select * from order_lines ol, products p, categories c " +
-                "where ol.product_id = p.id " +
+                "where ol.product_id = p.code " +
                 "and p.category_id = c.id " +
                 "and order_id = ?";
         PreparedStatement pstmt;

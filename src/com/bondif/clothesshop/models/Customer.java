@@ -19,8 +19,7 @@ public class Customer {
         this.email = email;
     }
 
-    public Customer(long id) {
-        this.id = id;
+    public Customer() {
     }
 
     public Long getId () { return id; }

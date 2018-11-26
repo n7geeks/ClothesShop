@@ -86,6 +86,11 @@ public class AppController {
         root.setCenter(pane);
     }
 
+    public static void showOrder(long id) {
+        Pane pane = OrdersController.show(id);
+        root.setCenter(pane);
+    }
+
     public static BorderPane getRoot() {
         return root;
     }

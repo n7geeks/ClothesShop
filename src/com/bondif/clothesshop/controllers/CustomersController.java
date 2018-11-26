@@ -2,6 +2,7 @@ package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.core.CustomerDaoImpl;
 import com.bondif.clothesshop.models.Customer;
+import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -267,6 +268,54 @@ public class CustomersController {
 
             AppController.showCustomers();
         });
+        return gridPane;
+    }
+
+    public static Pane getCustomerInfoPane(Customer customer) {
+        GridPane gridPane = new GridPane();
+
+        Label codeLabel = new Label("Code : ");
+        Label firstNameLabel = new Label("Prénom : ");
+        Label lastNameLabel = new Label("Nom : ");
+        Label telLabel = new Label("Téléphone : ");
+        Label addressLabel = new Label("Adresse : ");
+        Label emailLabel = new Label("Email : ");
+
+        Label codeValueLabel = new Label(customer.getCode());
+        Label firstNameValueLabel = new Label(customer.getFirstName());
+        Label lastNameValueLabel = new Label(customer.getLastName());
+        Label telValueLabel = new Label(customer.getPhone());
+        Label addressValueLabel = new Label(customer.getAddress());
+        Label emailValueLabel = new Label(customer.getEmail());
+
+        gridPane.add(codeLabel, 0, 0);
+        gridPane.add(firstNameLabel, 0, 1);
+        gridPane.add(lastNameLabel, 0, 2);
+        gridPane.add(telLabel, 2, 0);
+        gridPane.add(addressLabel, 2, 1);
+        gridPane.add(emailLabel, 2, 2);
+
+        gridPane.add(codeValueLabel, 1, 0);
+        gridPane.add(firstNameValueLabel, 1, 1);
+        gridPane.add(lastNameValueLabel, 1, 2);
+        gridPane.add(telValueLabel, 3, 0);
+        gridPane.add(addressValueLabel, 3, 1);
+        gridPane.add(emailValueLabel, 3, 2);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(20);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(20);
+        ColumnConstraints col3 = new ColumnConstraints();
+        col2.setPercentWidth(20);
+        ColumnConstraints col4 = new ColumnConstraints();
+        col2.setPercentWidth(20);
+
+        gridPane.getColumnConstraints().addAll(col1, col2, col3, col4);
+
+        gridPane.setHgap(5);
+        gridPane.setVgap(10);
+
         return gridPane;
     }
 

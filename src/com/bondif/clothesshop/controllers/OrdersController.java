@@ -2,6 +2,7 @@ package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.core.CustomerDaoImpl;
 import com.bondif.clothesshop.core.OrderDaoImpl;
+import com.bondif.clothesshop.core.OrderLineDaoImpl;
 import com.bondif.clothesshop.models.Customer;
 import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.models.OrderLine;
@@ -19,6 +20,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Date;
 
 public class OrdersController {
@@ -28,7 +30,6 @@ public class OrdersController {
 
     static {
         orderDao = new OrderDaoImpl();
-
     }
 
     public static Pane getSalesPane() {
@@ -55,7 +56,7 @@ public class OrdersController {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         // customer column
-        TableColumn<Order, String> customerCol = new TableColumn<>("Client");
+        TableColumn<Order, Customer> customerCol = new TableColumn<>("Client");
         customerCol.setCellValueFactory(new PropertyValueFactory<>("customer"));
 
         // total column
@@ -75,7 +76,7 @@ public class OrdersController {
 
             saleTr.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2 && !saleTr.isEmpty()) {
-                    OrdersController.show(saleTr.getItem().getId());
+                    AppController.showOrder(saleTr.getItem().getId());
                 }
             });
 
@@ -153,7 +154,38 @@ public class OrdersController {
         return new HBox(submitBtn);
     }
 
-    public static void show(long id) {
-        return;
+    public static Pane show(long id) {
+        Order order = orderDao.findOne(id);
+        OrderLineDaoImpl orderLineDao = new OrderLineDaoImpl();
+        Collection<OrderLine> orderLines = orderLineDao.findAll(order);
+
+        GridPane gridPane = (GridPane)CustomersController.getCustomerInfoPane(order.getCustomer());
+        TableView<OrderLine> orderLineTv = new TableView<>();
+
+        TableColumn<OrderLine, Product> labelCol = new TableColumn<>("Produit");
+        labelCol.setCellValueFactory(new PropertyValueFactory<>("product"));
+
+        TableColumn<OrderLine, Double> priceCol = new TableColumn<>("Prix");
+        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+        TableColumn<OrderLine, Double> qtyCol = new TableColumn<>("Quantité");
+        qtyCol.setCellValueFactory(new PropertyValueFactory<>("qty"));
+
+        TableColumn<OrderLine, Double> totalCol = new TableColumn<>("Total");
+        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
+
+        orderLineTv.getColumns().addAll(labelCol, priceCol, qtyCol, totalCol);
+        orderLineTv.setItems(FXCollections.observableArrayList(orderLines));
+
+        HBox hBox = new HBox();
+        Label totalLabel = new Label("Total : ");
+        Label totalValueLabel = new Label(order.getTotal() + "");
+        hBox.getChildren().addAll(totalLabel, totalValueLabel);
+
+        VBox vBox = new VBox(gridPane, orderLineTv, hBox);
+        vBox.setSpacing(10);
+        vBox.setPadding(new Insets(10));
+
+        return vBox;
     }
 }

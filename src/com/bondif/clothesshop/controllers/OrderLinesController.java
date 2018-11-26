@@ -12,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class OrderLinesController {
     private static OrderLineDaoImpl orderLineDao;
     private static ObservableList<OrderLine> orderLinesOl;
+    static TableView<OrderLine> orderLinesTv;
 
     static {
         orderLineDao = new OrderLineDaoImpl();
@@ -19,7 +20,7 @@ public class OrderLinesController {
     }
 
     public static TableView<OrderLine> getBasicTableView() {
-        TableView<OrderLine> orderLinesTv = new TableView<>();
+        orderLinesTv = new TableView<>();
         orderLinesOl = getOrderLinesOl();
 
         // price column
@@ -44,6 +45,15 @@ public class OrderLinesController {
     }
 
     public static void add(OrderLine orderLine) {
+        for (OrderLine oL: orderLinesOl) {
+            if(oL.getProduct().getCode().equals(orderLine.getProduct().getCode())) {
+                oL.setQty(oL.getQty() + orderLine.getQty());
+                orderLinesOl.remove(oL);
+                orderLinesOl.add(oL);
+                System.out.println(oL.getQty());
+                return;
+            }
+        }
         orderLinesOl.add(orderLine);
     }
 
