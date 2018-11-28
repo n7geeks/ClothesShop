@@ -183,10 +183,46 @@ public class CustomersController {
         submit.setText("Valider");
 
         submit.setOnAction(event -> {
-            customerDao.update(new Customer(customerId, codeTf.getText(), firstNameTf.getText(), lastNameTf.getText(), phoneTf.getText(),
-                    addressTf.getText(), emailTf.getText()));
-            AppController.showCustomers();
-            //Adding an alert
+
+            boolean isValidInput = false;
+
+            String code = codeTf.getText().trim();
+            if(code.isEmpty()){
+                GUITools.openDialogOk(null, null, "code est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String firstName = firstNameTf.getText().trim();
+            if(firstName.isEmpty()){
+                GUITools.openDialogOk(null, null, "prenom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String lastName = lastNameTf.getText().trim();
+            if(lastName.isEmpty()){
+                GUITools.openDialogOk(null, null, "nom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String phone = phoneTf.getText().trim();
+            if(phone.isEmpty()){
+                GUITools.openDialogOk(null, null, "numero telephone est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String address = addressTf.getText().trim();
+            if(address.isEmpty()){
+                GUITools.openDialogOk(null, null, "adresse est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String email = emailTf.getText().trim();
+            if(email.isEmpty()){
+                GUITools.openDialogOk(null, null, "email est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            if(isValidInput){
+                customerDao.update(new Customer(customerId, codeTf.getText(), firstNameTf.getText(), lastNameTf.getText(), phoneTf.getText(),
+                        addressTf.getText(), emailTf.getText()));
+                AppController.showCustomers();
+            }
+
         });
         return editPane;
     }
@@ -258,15 +294,44 @@ public class CustomersController {
         gridPane.getColumnConstraints().addAll(col1, col2);
 
         submitButton.setOnAction(event -> {
-            String code = codeTf.getText();
-            String firstName = firstNameTf.getText();
-            String lastName = lastNameTf.getText();
-            String phone = phoneTf.getText();
-            String address = addressTf.getText();
-            String email = emailTf.getText();
-            addCustomerHandler(new Customer(null, code, firstName, lastName, phone, address, email));
+            boolean isValidInput = false;
 
-            AppController.showCustomers();
+            String code = codeTf.getText().trim();
+            if(code.isEmpty()){
+                GUITools.openDialogOk(null, null, "code est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String firstName = firstNameTf.getText().trim();
+            if(firstName.isEmpty()){
+                GUITools.openDialogOk(null, null, "prenom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String lastName = lastNameTf.getText().trim();
+            if(lastName.isEmpty()){
+                GUITools.openDialogOk(null, null, "nom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String phone = phoneTf.getText().trim();
+            if(phone.isEmpty()){
+                GUITools.openDialogOk(null, null, "numero telephone est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String address = addressTf.getText().trim();
+            if(address.isEmpty()){
+                GUITools.openDialogOk(null, null, "adresse est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String email = emailTf.getText().trim();
+            if(email.isEmpty()){
+                GUITools.openDialogOk(null, null, "email est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            if(isValidInput){
+                addCustomerHandler(new Customer(null, code, firstName, lastName, phone, address, email));
+                AppController.showCustomers();
+            }
+
         });
         return gridPane;
     }

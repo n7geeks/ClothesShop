@@ -148,6 +148,14 @@ public class OrdersController {
         Button submitBtn = GUITools.getButton(null, "Passer la commande", 70);
 
         submitBtn.setOnAction(event -> {
+
+            boolean isValidInput = true;
+
+            if(OrderLinesController.getOrderLinesOl().size() == 0){
+                GUITools.openDialogOk(null, null, "la commande est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
             double sum = 0;
             for (OrderLine orderLine: OrderLinesController.getOrderLinesOl()) {
                 sum += orderLine.getTotal();
@@ -155,8 +163,16 @@ public class OrdersController {
                 (new ProductDaoImpl()).updateQty(orderLine.getProduct());
 
             }
-            orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl()));
-            AppController.showSales();
+
+            if(customersCb.getValue() == null){
+                GUITools.openDialogOk(null, null, "aucun Client est selectionné", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            if(isValidInput){
+                orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl()));
+                AppController.showSales();
+            }
         });
 
         return new HBox(submitBtn);
