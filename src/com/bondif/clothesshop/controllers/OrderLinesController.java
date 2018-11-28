@@ -2,6 +2,7 @@ package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.core.OrderLineDaoImpl;
 import com.bondif.clothesshop.models.OrderLine;
+import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,5 +60,13 @@ public class OrderLinesController {
 
     public static ObservableList<OrderLine> getOrderLinesOl() {
         return orderLinesOl == null ? FXCollections.observableArrayList() : orderLinesOl;
+    }
+
+    public static boolean canAddQty(Product product, int qty) {
+        for (OrderLine orderLine: orderLinesOl) {
+            if (orderLine.getProduct() == product)
+                if (orderLine.getQty() + qty > orderLine.getProduct().getQty()) return false;
+        }
+        return true;
     }
 }

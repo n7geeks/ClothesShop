@@ -75,7 +75,7 @@ public class GUITools {
         dialog.setTitle("Quantité");
         dialog.setHeaderText(null);
         dialog.setContentText("Entrer la quantité : ");
-
+        dialog.setOnCloseRequest(e-> dialog.hide());
         while(true) {
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent()) {

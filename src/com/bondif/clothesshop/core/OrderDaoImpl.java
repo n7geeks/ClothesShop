@@ -81,6 +81,7 @@ public class OrderDaoImpl extends AbstractDao implements Dao<Order> {
             long idOrder = rs.getLong("o.id");
             double total = rs.getDouble("o.total");
             LocalDateTime dateTime = Tools.toLocalDateTime(rs.getTimestamp("created_at"));
+            System.out.println(dateTime);
             order = new Order(idOrder, customer, total, dateTime);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -94,12 +95,11 @@ public class OrderDaoImpl extends AbstractDao implements Dao<Order> {
         OrderLineDaoImpl orderLineDao = new OrderLineDaoImpl();
         PreparedStatement pstsmt;
 
-        String query = "INSERT INTO orders VALUES (NULL, ?, ?, ?)";
+        String query = "INSERT INTO orders VALUES (NULL, ?, ?, now())";
         try {
             pstsmt = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             pstsmt.setLong(1, order.getCustomer().getId());
             pstsmt.setDouble(2, order.getTotal());
-            pstsmt.setDate(3, Tools.toDate(order.getCreatedAt()));
             pstsmt.execute();
 
             ResultSet generatedKeys = pstsmt.getGeneratedKeys();

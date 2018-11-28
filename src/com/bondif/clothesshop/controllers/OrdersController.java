@@ -3,12 +3,14 @@ package com.bondif.clothesshop.controllers;
 import com.bondif.clothesshop.core.CustomerDaoImpl;
 import com.bondif.clothesshop.core.OrderDaoImpl;
 import com.bondif.clothesshop.core.OrderLineDaoImpl;
+import com.bondif.clothesshop.core.ProductDaoImpl;
 import com.bondif.clothesshop.models.Customer;
 import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.models.OrderLine;
 import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
+import com.bondif.clothesshop.views.utils.Toast;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -127,8 +129,11 @@ public class OrdersController {
         TableColumn addProductCol = new TableColumn<>("Ajouter");
         addProductCol.setCellFactory(ActionButtonTableCell.forTableColumn("Ajouter", (Product p) -> {
             int qty = GUITools.openQtyTextInputDialog();
-            if(qty != -1)
+            if (qty == -1) return p;
+            if(qty > 0 && p.getQty() >= qty && OrderLinesController.canAddQty(p, qty))
                 OrderLinesController.add(new OrderLine(0, p, p.getSellingPrice(), qty));
+            else
+                GUITools.openDialogOk(null, null, "La quantité choisi est plus grande que celle en stock !!", Alert.AlertType.ERROR);
             return p;
         }));
 
@@ -146,6 +151,9 @@ public class OrdersController {
             double sum = 0;
             for (OrderLine orderLine: OrderLinesController.getOrderLinesOl()) {
                 sum += orderLine.getTotal();
+                orderLine.getProduct().setQty(orderLine.getProduct().getQty() - orderLine.getQty());
+                (new ProductDaoImpl()).updateQty(orderLine.getProduct());
+
             }
             orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl()));
             AppController.showSales();
