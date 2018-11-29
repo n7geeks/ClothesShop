@@ -24,6 +24,10 @@ public class OrderLinesController {
         orderLinesTv = new TableView<>();
         orderLinesOl = getOrderLinesOl();
 
+        //id column
+        /*TableColumn<Product, String> codeCol = new TableColumn<>("Libellé");
+        codeCol.setCellValueFactory(new PropertyValueFactory<>("label"));*/
+
         // price column
         TableColumn<OrderLine, Double> priceCol = new TableColumn<>("Prix");
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));

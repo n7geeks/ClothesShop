@@ -62,7 +62,13 @@ public class CategoriesController {
         });
 
         TextField tfsearch = new TextField("");
-        tfsearch.setMinWidth(300);
+
+        tfsearch.setPromptText("Rechercher");
+        tfsearch.setMinWidth(200);
+        tfsearch.setMinHeight(28);
+        tfsearch.setAlignment(Pos.CENTER);
+        tfsearch.getStyleClass().add("searchBar");
+        tfsearch.getStyleClass().remove("text-field");
         tfsearch.textProperty().addListener((observable, oldValue, newValue) -> {
             categoriesOl =FXCollections.observableArrayList(categoryDao.findAll(newValue));
             categoriesTableView.setItems(categoriesOl);
@@ -73,7 +79,7 @@ public class CategoriesController {
         littleWrapper.setVgap(10);
 
         littleWrapper.add(bnajouter, 0, 0);
-        littleWrapper.add(tfsearch, 1, 0);
+        littleWrapper.add(tfsearch, 2, 0);
 
         //id column
         TableColumn<Category, Long> idColumn = new TableColumn<>("id");
@@ -180,7 +186,8 @@ public class CategoriesController {
         titleTf = new TextField();
         titleTf.setPromptText("Nouvelle catégorie");
 
-        Button submitBtn = new Button("Créer");
+        String submitIcon = "resources/icons/checkmark-40.png";
+        Button submitBtn = GUITools.getButton(GUITools.getImage(submitIcon), "Créer", 100);
 
         submitBtn.setOnAction(event -> {
             addCategoryHandler(titleTf.getText().trim());

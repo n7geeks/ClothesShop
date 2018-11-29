@@ -35,10 +35,19 @@ public class ProductsController {
         productsOl = getProductsOl();
 
         VBox vBox = new VBox();
+        HBox hBox = new HBox();
+        Region region = new Region();
 
         // vbox config
         vBox.setPadding(new Insets(20));
         vBox.setSpacing(10);
+
+        //hBox config
+        hBox.setPadding(new Insets(20));
+        hBox.setSpacing(10);
+
+        //region config
+        HBox.setHgrow(region, Priority.ALWAYS);
 
         // Add product button
         String addIconPath = "resources/icons/plus-math-30.png";
@@ -64,6 +73,7 @@ public class ProductsController {
             ProductsController.editHandler(p);
             return p;
         }));
+        editColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 15));
 
         // Delete column
         TableColumn deleteColumn = new TableColumn<>("Supprimer");
@@ -71,6 +81,7 @@ public class ProductsController {
             ProductsController.deleteProductHandler(p);
             return p;
         }));
+        deleteColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 15));
 
         productsTableView.getColumns().addAll(editColumn, deleteColumn);
 
@@ -89,10 +100,15 @@ public class ProductsController {
         });
 
         // Search
-        HBox searchContainer = new HBox(20);
+        //HBox searchContainer = new HBox(20);
         TextField searchTf = new TextField();
-        searchTf.setPromptText("search");
-        searchTf.setMinWidth(300);
+        searchTf.setPromptText("Rechercher");
+        //searchTf.setMinWidth(300);
+        searchTf.getStyleClass().add("searchBar");
+        searchTf.setMinWidth(200);
+        searchTf.setMinHeight(28);
+        searchTf.setAlignment(Pos.CENTER);
+        searchTf.getStyleClass().remove("text-field");
 
         searchTf.textProperty().addListener((observable, oldValue, newValue) -> {
             newValue = newValue.trim();
@@ -105,10 +121,14 @@ public class ProductsController {
             }
         });
 
-        searchContainer.getChildren().add(searchTf);
-        searchContainer.setAlignment(Pos.CENTER_RIGHT);
+        /*searchContainer.getChildren().add(searchTf);
+        searchContainer.setAlignment(Pos.CENTER_RIGHT);*/
 
-        vBox.getChildren().addAll(addBtn, categoryBtn, searchContainer, productsTableView);
+
+        //hBox config
+        hBox.getChildren().addAll(addBtn, categoryBtn, region, searchTf);
+
+        vBox.getChildren().addAll(hBox, productsTableView);
 
         return vBox;
     }
@@ -150,8 +170,10 @@ public class ProductsController {
         TextField sellPriceTf = new TextField();
         sellPriceTf.setPromptText("Prix de vente");
         ComboBox<Category> categoriesCb = new ComboBox<>(FXCollections.observableArrayList(new CategoryDaoImpl().findAll()));
+        categoriesCb.setPromptText("Choisissez une catégorie");
 
-        Button submitBtn = new Button("Créer");
+        String submitIconBtn = "resources/icons/checkmark-40.png";
+        Button submitBtn = GUITools.getButton(GUITools.getImage(submitIconBtn), "Créer", 100);
 
         submitBtn.setOnAction(event -> {
             boolean isValidInput = true;
@@ -270,26 +292,32 @@ public class ProductsController {
         // code column
         TableColumn<Product, Long> codeColumn = new TableColumn<>("Code");
         codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
+        codeColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 5));
 
         // label column
         TableColumn<Product, String> labelColumn = new TableColumn<>("Désignation");
         labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
+        labelColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 15));
 
         // qty column
         TableColumn<Product, Integer> qtyColumn = new TableColumn<>("Quantité");
         qtyColumn.setCellValueFactory(new PropertyValueFactory<>("qty"));
+        qtyColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 6));
 
         // buyPrice column
         TableColumn<Product, Double> buyPriceColumn = new TableColumn<>("Prix d'achat");
         buyPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
+        buyPriceColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 10));
 
         // sellPrice column
         TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
         sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+        sellPriceColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 10));
 
         // category column
-        TableColumn<Product, Category> categoryColumn = new TableColumn<>("Categorie");
+        TableColumn<Product, Category> categoryColumn = new TableColumn<>("Catégorie");
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+        categoryColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 15));
 
         productsTableView.getColumns().addAll(codeColumn, labelColumn, qtyColumn, buyPriceColumn, sellPriceColumn, categoryColumn);
 

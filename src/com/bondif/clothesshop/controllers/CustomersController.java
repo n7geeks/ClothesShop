@@ -74,44 +74,44 @@ public class CustomersController {
         //Customer id column
         TableColumn<Customer, Long> idColumn = new TableColumn<>("id");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        //idColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 5));
-        idColumn.setPrefWidth(38.5);
+        idColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 5));
+        //idColumn.setPrefWidth(38.5);
 
         //Customer code column
         TableColumn<Customer, String> codeColumn = new TableColumn<>("code");
         codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
-        //codeColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
-        codeColumn.setPrefWidth(77);
+        codeColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
+        //codeColumn.setPrefWidth(77);
 
         //Customer first name column
         TableColumn<Customer, String> firstNameColumn = new TableColumn<>("Prénom");
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        //firstNameColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
-        firstNameColumn.setPrefWidth(77);
+        firstNameColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
+        //firstNameColumn.setPrefWidth(77);
 
         //Customer last name column
         TableColumn<Customer, String> lastNameColumn = new TableColumn<>("Nom");
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        //lastNameColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
-        lastNameColumn.setPrefWidth(77);
+        lastNameColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
+        //lastNameColumn.setPrefWidth(77);
 
         //Customer phone column
         TableColumn<Customer, String> phoneColumn = new TableColumn<>("Téléphone");
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        //phoneColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 15));
-        phoneColumn.setPrefWidth(115.5);
+        phoneColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 15));
+        //phoneColumn.setPrefWidth(115.5);
 
         //Customer address column
         TableColumn<Customer, String> addressColumn = new TableColumn<>("Adresse");
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
-        //addressColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 25));
-        addressColumn.setPrefWidth(192.5);
+        addressColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 25));
+        //addressColumn.setPrefWidth(192.5);
 
         //Customer email column
         TableColumn<Customer, String> emailColumn = new TableColumn<>("Email");
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        //emailColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 25));
-        emailColumn.setPrefWidth(192.5);
+        emailColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 25));
+        //emailColumn.setPrefWidth(192.5);
 
         //Adding columns to the table view
         customersList.getColumns().addAll(idColumn, codeColumn, firstNameColumn, lastNameColumn, phoneColumn, addressColumn, emailColumn);
