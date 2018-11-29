@@ -5,23 +5,32 @@ import java.util.Collection;
 
 public class Order {
     private long id;
-    private String customer;
+    private Customer customer;
     private double total;
     private LocalDateTime createdAt;
     private Collection<OrderLine> orderLines;
 
-    public Order(long id, String customer, double total, LocalDateTime createdAt) {
+    public Order(long id, Customer customer, double total, LocalDateTime createdAt) {
         this.id = id;
         this.customer = customer;
         this.total = total;
         this.createdAt = createdAt;
     }
 
+    public Order(long id, Customer customer, double total, LocalDateTime createdAt, Collection<OrderLine> orderLines) {
+        this.id = id;
+        this.customer = customer;
+        this.total = total;
+        this.createdAt = createdAt;
+        this.orderLines = orderLines;
+    }
+
     public Order() {
         this.id = 0;
-        this.customer = "";
+        this.customer = null;
         this.total = 0;
         this.createdAt = null;
+        this.orderLines = null;
     }
 
     public long getId() {
@@ -32,11 +41,11 @@ public class Order {
         this.id = id;
     }
 
-    public String getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    public void setCustomer(String customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
@@ -54,5 +63,13 @@ public class Order {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Collection<OrderLine> getOrderLines() {
+        return orderLines;
+    }
+
+    public void setOrderLines(Collection<OrderLine> orderLines) {
+        this.orderLines = orderLines;
     }
 }

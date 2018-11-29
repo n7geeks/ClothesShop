@@ -1,6 +1,5 @@
 package com.bondif.clothesshop.controllers;
 
-import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.views.GUIGenerator;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -36,7 +35,6 @@ public class AppController {
 
     public static void launch(Stage stage) {
         AppController.stage = stage;
-        configStage();
         AppController.stage.setTitle("Clothes Shop");
         Scene scene = new Scene(AppController.getRoot(), 1000, 600);
         scene.getStylesheets().add("decorateForm.css");
@@ -94,6 +92,11 @@ public class AppController {
 
     public static void showSaleCreateForm() {
         Pane pane = OrdersController.getCreateForm();
+        root.setCenter(pane);
+    }
+
+    public static void showOrder(long id) {
+        Pane pane = OrdersController.show(id);
         root.setCenter(pane);
     }
 

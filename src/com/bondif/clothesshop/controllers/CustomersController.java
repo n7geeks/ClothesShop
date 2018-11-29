@@ -2,6 +2,7 @@ package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.core.CustomerDaoImpl;
 import com.bondif.clothesshop.models.Customer;
+import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -212,6 +213,48 @@ public class CustomersController {
             //Adding an alert
         });
 
+        validate.setOnAction(event -> {
+
+            boolean isValidInput = false;
+
+            String code = codeTf.getText().trim();
+            if(code.isEmpty()){
+                GUITools.openDialogOk(null, null, "code est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String firstName = firstNameTf.getText().trim();
+            if(firstName.isEmpty()){
+                GUITools.openDialogOk(null, null, "prenom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String lastName = lastNameTf.getText().trim();
+            if(lastName.isEmpty()){
+                GUITools.openDialogOk(null, null, "nom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String phone = phoneTf.getText().trim();
+            if(phone.isEmpty()){
+                GUITools.openDialogOk(null, null, "numero telephone est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String address = addressTf.getText().trim();
+            if(address.isEmpty()){
+                GUITools.openDialogOk(null, null, "adresse est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String email = emailTf.getText().trim();
+            if(email.isEmpty()){
+                GUITools.openDialogOk(null, null, "email est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            if(isValidInput){
+                customerDao.update(new Customer(customerId, codeTf.getText(), firstNameTf.getText(), lastNameTf.getText(), phoneTf.getText(),
+                        addressTf.getText(), emailTf.getText()));
+                AppController.showCustomers();
+            }
+        });
+
         return editPane;
     }
 
@@ -286,16 +329,93 @@ public class CustomersController {
 
         // Adding customer into database
         submitButton.setOnAction(event -> {
-            String code = codeTf.getText();
-            String firstName = firstNameTf.getText();
-            String lastName = lastNameTf.getText();
-            String phone = phoneTf.getText();
-            String address = addressTf.getText();
-            String email = emailTf.getText();
-            addCustomerHandler(new Customer(null, code, firstName, lastName, phone, address, email));
+            boolean isValidInput = false;
 
-            AppController.showCustomers();
+            String code = codeTf.getText().trim();
+            if(code.isEmpty()){
+                GUITools.openDialogOk(null, null, "code est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String firstName = firstNameTf.getText().trim();
+            if(firstName.isEmpty()){
+                GUITools.openDialogOk(null, null, "prenom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String lastName = lastNameTf.getText().trim();
+            if(lastName.isEmpty()){
+                GUITools.openDialogOk(null, null, "nom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String phone = phoneTf.getText().trim();
+            if(phone.isEmpty()){
+                GUITools.openDialogOk(null, null, "numero telephone est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String address = addressTf.getText().trim();
+            if(address.isEmpty()){
+                GUITools.openDialogOk(null, null, "adresse est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String email = emailTf.getText().trim();
+            if(email.isEmpty()){
+                GUITools.openDialogOk(null, null, "email est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            if(isValidInput){
+                addCustomerHandler(new Customer(null, code, firstName, lastName, phone, address, email));
+                AppController.showCustomers();
+            }
+
         });
+        return gridPane;
+    }
+
+    public static Pane getCustomerInfoPane(Customer customer) {
+        GridPane gridPane = new GridPane();
+
+        Label codeLabel = new Label("Code : ");
+        Label firstNameLabel = new Label("Prénom : ");
+        Label lastNameLabel = new Label("Nom : ");
+        Label telLabel = new Label("Téléphone : ");
+        Label addressLabel = new Label("Adresse : ");
+        Label emailLabel = new Label("Email : ");
+
+        Label codeValueLabel = new Label(customer.getCode());
+        Label firstNameValueLabel = new Label(customer.getFirstName());
+        Label lastNameValueLabel = new Label(customer.getLastName());
+        Label telValueLabel = new Label(customer.getPhone());
+        Label addressValueLabel = new Label(customer.getAddress());
+        Label emailValueLabel = new Label(customer.getEmail());
+
+        gridPane.add(codeLabel, 0, 0);
+        gridPane.add(firstNameLabel, 0, 1);
+        gridPane.add(lastNameLabel, 0, 2);
+        gridPane.add(telLabel, 2, 0);
+        gridPane.add(addressLabel, 2, 1);
+        gridPane.add(emailLabel, 2, 2);
+
+        gridPane.add(codeValueLabel, 1, 0);
+        gridPane.add(firstNameValueLabel, 1, 1);
+        gridPane.add(lastNameValueLabel, 1, 2);
+        gridPane.add(telValueLabel, 3, 0);
+        gridPane.add(addressValueLabel, 3, 1);
+        gridPane.add(emailValueLabel, 3, 2);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(20);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(20);
+        ColumnConstraints col3 = new ColumnConstraints();
+        col2.setPercentWidth(20);
+        ColumnConstraints col4 = new ColumnConstraints();
+        col2.setPercentWidth(20);
+
+        gridPane.getColumnConstraints().addAll(col1, col2, col3, col4);
+
+        gridPane.setHgap(5);
+        gridPane.setVgap(10);
+
         return gridPane;
     }
 

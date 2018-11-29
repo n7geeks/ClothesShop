@@ -19,6 +19,9 @@ public class Customer {
         this.email = email;
     }
 
+    public Customer() {
+    }
+
     public Long getId () { return id; }
 
     public String getCode() { return code; }
@@ -46,4 +49,9 @@ public class Customer {
     public void setAddress(String address) { this.address = address; }
 
     public void setEmail(String email) { this.email = email; }
+
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
+    }
 }

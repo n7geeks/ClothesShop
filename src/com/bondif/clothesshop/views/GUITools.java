@@ -80,13 +80,13 @@ public class GUITools {
         dialog.setTitle("Quantité");
         dialog.setHeaderText(null);
         dialog.setContentText("Entrer la quantité : ");
-
+        dialog.setOnCloseRequest(e-> dialog.hide());
         while(true) {
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent()) {
                 try {
                     int qty = Integer.parseInt(result.get());
-                    if(qty == 0) continue;
+                    if(qty <= 0) continue;
 
                     return qty;
                 } catch (NumberFormatException e) {

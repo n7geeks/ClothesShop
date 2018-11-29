@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Collection;
 
 public class ProductsController {
     private static ObservableList<Product> productsOl;
@@ -87,7 +88,27 @@ public class ProductsController {
             return productTableRow;
         });
 
-        vBox.getChildren().addAll(addBtn, categoryBtn, productsTableView);
+        // Search
+        HBox searchContainer = new HBox(20);
+        TextField searchTf = new TextField();
+        searchTf.setPromptText("search");
+        searchTf.setMinWidth(300);
+
+        searchTf.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.trim();
+            oldValue = oldValue.trim();
+            if(!newValue.equals(oldValue)) {
+                System.out.println("searching...");
+                Collection<Product> filterdProducts = new ProductDaoImpl().findAll(newValue);
+                productsOl = FXCollections.observableArrayList(filterdProducts);
+                productsTableView.setItems(productsOl);
+            }
+        });
+
+        searchContainer.getChildren().add(searchTf);
+        searchContainer.setAlignment(Pos.CENTER_RIGHT);
+
+        vBox.getChildren().addAll(addBtn, categoryBtn, searchContainer, productsTableView);
 
         return vBox;
     }
@@ -96,7 +117,6 @@ public class ProductsController {
         GridPane gridPane = new GridPane();
 
         gridPane.setAlignment(Pos.CENTER);
-//        gridPane.setStyle("-fx-border-width: 2px; -fx-border-style: solid; -fx-grid-lines-visible: true");
 
         String imagePath = "resources/icons8-add-image-64.png";
         ImageView imageView = new ImageView(GUITools.getImage(imagePath));
@@ -113,6 +133,7 @@ public class ProductsController {
 
         Label codeLabel = new Label("Code");
         Label labelLabel = new Label("Désignation");
+        Label qtyLabel = new Label("Quantité");
         Label buyPriceLabel = new Label("Prix d'achat");
         Label sellPriceLabel = new Label("Prix de vente");
         Label categoryLabel = new Label("Catégorie");
@@ -122,6 +143,8 @@ public class ProductsController {
         codeTf.setPromptText("Code");
         TextField labelTf = new TextField();
         labelTf.setPromptText("Désignation");
+        TextField qtyTf = new TextField();
+        qtyTf.setPromptText("Quantité");
         TextField buyPriceTf = new TextField();
         buyPriceTf.setPromptText("Prix d'achat");
         TextField sellPriceTf = new TextField();
@@ -131,30 +154,74 @@ public class ProductsController {
         Button submitBtn = new Button("Créer");
 
         submitBtn.setOnAction(event -> {
+            boolean isValidInput = true;
+            int qty = 0;
+            double sellingPrice = 0.0, buyingPrice = 0.0;
+
             String label = labelTf.getText();
-            Double buyingPrice = Double.parseDouble(buyPriceTf.getText());
-            Double sellingPrice = Double.parseDouble(sellPriceTf.getText());
+            if(label.trim().isEmpty()){
+                GUITools.openDialogOk(null, null, "designation est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            try{
+                qty = Integer.parseInt(qtyTf.getText());
+                if(qty <= 0){
+                    GUITools.openDialogOk(null, null, "la qunatité doit être superieure à 0", Alert.AlertType.WARNING);
+                    isValidInput = false;
+                }
+            }catch(NumberFormatException ex){
+                GUITools.openDialogOk(null, null, "la qunatité doit être un entier", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            try{
+                buyingPrice = Double.parseDouble(buyPriceTf.getText());
+                if(buyingPrice <= 0){
+                    GUITools.openDialogOk(null, null, "le prix d'achat doit être superieur à 0", Alert.AlertType.WARNING);
+                    isValidInput = false;
+                }
+            }catch(NumberFormatException ex){
+                GUITools.openDialogOk(null, null, "le prix d'achat doit être un reel", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            try{
+                sellingPrice = Double.parseDouble(sellPriceTf.getText());
+                if(sellingPrice <= 0){
+                    GUITools.openDialogOk(null, null, "le prix de vente doit être superieur à 0", Alert.AlertType.WARNING);
+                    isValidInput = false;
+                }
+            }catch(NumberFormatException ex){
+                GUITools.openDialogOk(null, null, "le prix de vente doit être un reel", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
             String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
             Category category = categoriesCb.getValue();
-
-            addProductHandler(new Product(null, label, buyingPrice, sellingPrice, image, category));
-
-            AppController.showProducts();
+            if(category == null){
+                GUITools.openDialogOk(null, null, "aucune categorie est selectionnée", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            if(isValidInput){
+                addProductHandler(new Product(null, label, qty, buyingPrice, sellingPrice, image, category));
+                AppController.showProducts();
+            }
         });
 
         gridPane.add(imageView, 0, 0, 2, 1);
 
         gridPane.add(codeLabel, 0, 1);
         gridPane.add(labelLabel, 0, 2);
-        gridPane.add(buyPriceLabel, 0, 3);
-        gridPane.add(sellPriceLabel, 0, 4);
-        gridPane.add(categoryLabel, 0, 5);
+        gridPane.add(qtyLabel, 0, 3);
+        gridPane.add(buyPriceLabel, 0, 4);
+        gridPane.add(sellPriceLabel, 0, 5);
+        gridPane.add(categoryLabel, 0, 6);
 
         gridPane.add(codeTf, 1, 1);
         gridPane.add(labelTf, 1, 2);
-        gridPane.add(buyPriceTf, 1, 3);
-        gridPane.add(sellPriceTf, 1, 4);
-        gridPane.add(categoriesCb, 1, 5);
+        gridPane.add(qtyTf, 1, 3);
+        gridPane.add(buyPriceTf, 1, 4);
+        gridPane.add(sellPriceTf, 1, 5);
+        gridPane.add(categoriesCb, 1, 6);
 
         gridPane.add(submitBtn, 0, 6, 2, 1);
 
@@ -170,7 +237,6 @@ public class ProductsController {
 
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-
 
         return gridPane;
     }
@@ -209,6 +275,10 @@ public class ProductsController {
         TableColumn<Product, String> labelColumn = new TableColumn<>("Désignation");
         labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
 
+        // qty column
+        TableColumn<Product, Integer> qtyColumn = new TableColumn<>("Quantité");
+        qtyColumn.setCellValueFactory(new PropertyValueFactory<>("qty"));
+
         // buyPrice column
         TableColumn<Product, Double> buyPriceColumn = new TableColumn<>("Prix d'achat");
         buyPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
@@ -221,7 +291,7 @@ public class ProductsController {
         TableColumn<Product, Category> categoryColumn = new TableColumn<>("Categorie");
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-        productsTableView.getColumns().addAll(codeColumn, labelColumn, buyPriceColumn, sellPriceColumn, categoryColumn);
+        productsTableView.getColumns().addAll(codeColumn, labelColumn, qtyColumn, buyPriceColumn, sellPriceColumn, categoryColumn);
 
         return productsTableView;
     }
@@ -236,34 +306,88 @@ public class ProductsController {
         ImageView imageView = (ImageView) gridPane.getChildren().get(0);
         imageView.setImage(GUITools.getImage(product.getImage()));
 
-        TextField codeTf = (TextField) gridPane.getChildren().get(6);
+        TextField codeTf = (TextField) gridPane.getChildren().get(7);
         codeTf.setText(product.getCode().toString());
+        codeTf.setDisable(true);
 
-        TextField labelTf = (TextField) gridPane.getChildren().get(7);
+        TextField labelTf = (TextField) gridPane.getChildren().get(8);
         labelTf.setText(product.getLabel());
 
-        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(8);
+        TextField qtyTf = (TextField) gridPane.getChildren().get(9);
+        qtyTf.setText(product.getQty() + "");
+
+        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(10);
         buyingPriceTf.setText(product.getBuyingPrice() + "");
 
-        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(9);
+        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(11);
         sellingPriceTf.setText(product.getSellingPrice() + "");
 
-        ComboBox<Category> categoriesCb = (ComboBox<Category>) gridPane.getChildren().get(10);
+        ComboBox<Category> categoriesCb = (ComboBox<Category>) gridPane.getChildren().get(12);
         categoriesCb.setValue(product.getCategory());
 
-        Button updateButton = (Button) gridPane.getChildren().get(11);
+        Button updateButton = (Button) gridPane.getChildren().get(13);
         updateButton.setText("Modifier");
 
         updateButton.setOnAction(e -> {
-            long code = Long.parseLong(codeTf.getText());
+            boolean isValidInput = true;
+            long code = 0;
+            int qty = 0;
+            double buyingPrice = 0.0, sellingPrice = 0.0;
+
+            try{
+                code = Long.parseLong(codeTf.getText());
+            }catch(NumberFormatException ex){
+                GUITools.openDialogOk(null, null, "le code doit être un entier", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
             String label = labelTf.getText();
-            double buyingPrice = Double.parseDouble(buyingPriceTf.getText());
-            double sellingPrice = Double.parseDouble(sellingPriceTf.getText());
+            if(label.trim().isEmpty()){
+                GUITools.openDialogOk(null, null, "designation est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            try{
+                qty = Integer.parseInt(qtyTf.getText());
+                if(qty <= 0){
+                    GUITools.openDialogOk(null, null, "la qunatité doit être superieure à 0", Alert.AlertType.WARNING);
+                    isValidInput = false;
+                }
+            }catch(NumberFormatException ex){
+                GUITools.openDialogOk(null, null, "la qunatité doit être un entier", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            try{
+                buyingPrice = Double.parseDouble(buyingPriceTf.getText());
+                if(buyingPrice <= 0){
+                    GUITools.openDialogOk(null, null, "le prix d'achat doit être superieur à 0", Alert.AlertType.WARNING);
+                    isValidInput = false;
+                }
+            }catch(NumberFormatException ex){
+                GUITools.openDialogOk(null, null, "le prix d'achat doit être un reel", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            try{
+                sellingPrice = Double.parseDouble(sellingPriceTf.getText());
+                if(sellingPrice <= 0){
+                    GUITools.openDialogOk(null, null, "le prix de vente doit être superieur à 0", Alert.AlertType.WARNING);
+                    isValidInput = false;
+                }
+            }catch(NumberFormatException ex){
+                GUITools.openDialogOk(null, null, "le prix de vente doit être un reel", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
             String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
             Category category = categoriesCb.getValue();
+            if(category == null){
+                GUITools.openDialogOk(null, null, "aucune categorie est selectionnée", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
 
-            productDao.update(new Product(code, label, buyingPrice, sellingPrice, image, category));
-            AppController.getRoot().setCenter(getProductPane(productDao.findOne(product.getCode())));
+            if(isValidInput){
+                productDao.update(new Product(code, label, qty, buyingPrice, sellingPrice, image, category));
+                AppController.getRoot().setCenter(getProductPane(productDao.findOne(product.getCode())));
+            }
         });
 
         return gridPane;
@@ -272,10 +396,10 @@ public class ProductsController {
     private static Pane getProductPane(Product product) {
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
-//        gridPane.gridLinesVisibleProperty().setValue(true);
 
         Text codeLabelTxt = new Text("Code");
         Text labelLabelTxt = new Text("Label");
+        Text qtyLabelTxt = new Text("Quantité");
         Text buyingPriceLabelTxt = new Text("Prix d'achat");
         Text sellingPriceLabelTxt = new Text("Prix de vente");
         Text categoryLabelTxt = new Text("Catégorie");
@@ -285,22 +409,25 @@ public class ProductsController {
         imageView.setPreserveRatio(true);
         Text codeTxt = new Text(product.getCode().toString());
         Text labelTxt = new Text(product.getLabel());
+        Text qtyTxt = new Text(product.getQty() + "");
         Text buyingPriceTxt = new Text(product.getBuyingPrice() + "");
         Text sellingPriceTxt = new Text(product.getSellingPrice() + "");
         Text categoryTxt = new Text(product.getCategory().getTitle());
 
         gridPane.add(codeLabelTxt, 0, 1);
         gridPane.add(labelLabelTxt, 0, 2);
-        gridPane.add(buyingPriceLabelTxt, 0, 3);
-        gridPane.add(sellingPriceLabelTxt, 0, 4);
-        gridPane.add(categoryLabelTxt, 0, 5);
+        gridPane.add(qtyLabelTxt, 0, 3);
+        gridPane.add(buyingPriceLabelTxt, 0, 4);
+        gridPane.add(sellingPriceLabelTxt, 0, 5);
+        gridPane.add(categoryLabelTxt, 0, 6);
 
         gridPane.add(imageView, 0, 0, 2, 1);
         gridPane.add(codeTxt, 1, 1);
         gridPane.add(labelTxt, 1, 2);
-        gridPane.add(buyingPriceTxt, 1, 3);
-        gridPane.add(sellingPriceTxt, 1, 4);
-        gridPane.add(categoryTxt, 1, 5);
+        gridPane.add(qtyTxt, 1, 3);
+        gridPane.add(buyingPriceTxt, 1, 4);
+        gridPane.add(sellingPriceTxt, 1, 5);
+        gridPane.add(categoryTxt, 1, 6);
 
         GridPane.setHalignment(imageView, HPos.CENTER);
 

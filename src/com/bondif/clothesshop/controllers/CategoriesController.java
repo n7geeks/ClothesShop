@@ -74,13 +74,7 @@ public class CategoriesController {
 
         littleWrapper.add(bnajouter, 0, 0);
         littleWrapper.add(tfsearch, 1, 0);
-        //GridPane.setHalignment(tfsearch, HPos.CENTER);
-        /*ColumnConstraints column1 = new ColumnConstraints();
-        column1.setPercentWidth(10);
-        ColumnConstraints column2 = new ColumnConstraints();
-        column2.setPercentWidth(50);
-        littleWrapper.getColumnConstraints().addAll(column1, column2);
-*/
+
         //id column
         TableColumn<Category, Long> idColumn = new TableColumn<>("id");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -140,8 +134,6 @@ public class CategoriesController {
                 }
             }
         });
-
-
 
         gp_alter.add(titleLabel, 0, 0);
         gp_alter.add(tfcategory, 1, 0);
@@ -213,7 +205,6 @@ public class CategoriesController {
 
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-
 
         return gridPane;
     }

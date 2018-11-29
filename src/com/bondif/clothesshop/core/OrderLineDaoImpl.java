@@ -21,7 +21,7 @@ public class OrderLineDaoImpl extends AbstractDao implements Dao<OrderLine> {
     public Collection<OrderLine> findAll(Order order) {
         Collection<OrderLine> orderLines = new LinkedList<>();
         String sql = "select * from order_lines ol, products p, categories c " +
-                "where ol.product_id = p.id " +
+                "where ol.product_id = p.code " +
                 "and p.category_id = c.id " +
                 "and order_id = ?";
         PreparedStatement pstmt;
@@ -73,8 +73,20 @@ public class OrderLineDaoImpl extends AbstractDao implements Dao<OrderLine> {
     }
 
     @Override
-    public void create(OrderLine entity) {
+    public void create(OrderLine orderLine) {
+        PreparedStatement pstsmt;
 
+        String query = "INSERT INTO order_lines VALUES (NULL, ?, ?, ?, ?)";
+        try {
+            pstsmt = getConnection().prepareStatement(query);
+            pstsmt.setLong(1, orderLine.getProduct().getCode());
+            pstsmt.setLong(2, orderLine.getOrder().getId());
+            pstsmt.setInt(3, orderLine.getQty());
+            pstsmt.setDouble(4, orderLine.getPrice());
+            pstsmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
