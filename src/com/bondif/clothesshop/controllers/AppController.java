@@ -4,7 +4,9 @@ import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.views.GUIGenerator;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -18,9 +20,14 @@ public class AppController {
     static {
         System.out.println("launched");
         root = new BorderPane();
-
+        //root.setStyle("-fx-background-radius: 20");
         root.setLeft(GUIGenerator.getSideBar());
         root.setTop(GUIGenerator.getTopBar());
+        //root.getLeft().setStyle("-fx-background-radius: 0 0 0 20; -fx-background-color: #eee");
+        //root.getTop().setStyle("-fx-background-radius: 20 20 0 0; -fx-background-color: #488b8f;");
+        root.getLeft().getStyleClass().add("left");
+        root.getTop().getStyleClass().add("top");
+        root.getStyleClass().add("root");
     }
 
     public static Stage getStage(){
@@ -31,10 +38,12 @@ public class AppController {
         AppController.stage = stage;
         configStage();
         AppController.stage.setTitle("Clothes Shop");
-        configStage();
         Scene scene = new Scene(AppController.getRoot(), 1000, 600);
-
+        scene.getStylesheets().add("decorateForm.css");
         AppController.stage.setScene(scene);
+        scene.setFill(Color.TRANSPARENT);
+        AppController.stage.initStyle(StageStyle.TRANSPARENT);
+        //scene.getStylesheets().add(AppController.class.getClass().getResource("resources/stylesheet.css").toString());
         AppController.stage.show();
     }
 
@@ -70,6 +79,7 @@ public class AppController {
 
     public static void showEditCustomerForm(){
         Pane pane = CustomersController.getEditPane();
+        root.setCenter(pane);
     }
 
     public static void showCategoryForm(){

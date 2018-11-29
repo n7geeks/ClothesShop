@@ -48,12 +48,15 @@ public class CategoriesController {
         categoriesOl = FXCollections.observableArrayList(categoryDao.findAll());
 
         VBox catform = new VBox();
+        String addIconPath = "resources/icons/plus-math-30.png";
+        String deleteIconPath = "resources/icons/cancel-40.png";
+        String editIconPath = "resources/icons/pencil-40.png";
 
         catform.setPadding(new Insets(20));
         catform.setSpacing(10);
 
         categoriesTableView = new TableView<>();
-        Button bnajouter = GUITools.getButton(null, "ajouter", 100);
+        Button bnajouter = GUITools.getButton(GUITools.getImage(addIconPath), "Ajouter", 100);
         bnajouter.setOnAction(e -> {
             AppController.showCreateCategoryForm();
         });
@@ -82,10 +85,13 @@ public class CategoriesController {
         TableColumn<Category, Long> idColumn = new TableColumn<>("id");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         idColumn.setMinWidth(200);
+        idColumn.prefWidthProperty().bind(categoriesTableView.widthProperty().divide(100 / 50));
+
         //id column
-        TableColumn<Category, String> titleColumn = new TableColumn<>("catégorie");
+        TableColumn<Category, String> titleColumn = new TableColumn<>("Catégorie");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         titleColumn.setMinWidth(400);
+        titleColumn.prefWidthProperty().bind(categoriesTableView.widthProperty().divide(100 / 50));
 
         categoriesTableView.getColumns().addAll(idColumn, titleColumn);
         categoriesTableView.setItems(categoriesOl);
@@ -104,8 +110,8 @@ public class CategoriesController {
         GridPane gp_alter = new GridPane();
         gp_alter.setAlignment(Pos.CENTER);
 
-        Button bnsupprimer = GUITools.getButton(null, "supprimer", 100);
-        Button bnmodifier = GUITools.getButton(null, "modifier", 100);
+        Button bnsupprimer = GUITools.getButton(GUITools.getImage(deleteIconPath), "Supprimer", 100);
+        Button bnmodifier = GUITools.getButton(GUITools.getImage(editIconPath), "Modifier", 100);
 
         bnmodifier.setOnAction(event -> {
             updateCategory();
@@ -115,9 +121,9 @@ public class CategoriesController {
             deleteCategory();
         });
 
-        Label titleLabel = new Label("catégorie");
+        Label titleLabel = new Label("Catégorie");
         tfcategory = new TextField();
-        tfcategory.setPromptText("aucun catégorie est selectionné");
+        tfcategory.setPromptText("Aucune catégorie est selectionnée");
         // Younes : on text changed do: - disable button 'modifier' if no changes has been commited
         //                              - can't write if no category is selected
         tfcategory.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -174,13 +180,13 @@ public class CategoriesController {
 //        gridPane.setStyle("-fx-border-width: 2px; -fx-border-style: solid; -fx-grid-lines-visible: true");
 
         Label idLabel = new Label("id");
-        Label titleLabel = new Label("categorie");
+        Label titleLabel = new Label("Categorie");
 
         TextField idTf = new TextField();
-        idTf.setPromptText("id categorie <to be generated>");
+        idTf.setPromptText("id catégorie <to be generated>");
         idTf.setDisable(true);
         titleTf = new TextField();
-        titleTf.setPromptText("nouvelle categorie");
+        titleTf.setPromptText("Nouvelle catégorie");
 
         Button submitBtn = new Button("Créer");
 
@@ -228,12 +234,12 @@ public class CategoriesController {
         Category c = categoriesTableView.getSelectionModel().getSelectedItem();
         //todo if no Category is selected
         if (c != null) {
-            if (GUITools.openDialogYesNo("sûr?", null, "êtes-vous sûr de supprimer la catégorie : " + c.getTitle(), Alert.AlertType.WARNING)) {
+            if (GUITools.openDialogYesNo("sûr?", null, "Etes-vous sûr de supprimer la catégorie : " + c.getTitle(), Alert.AlertType.WARNING)) {
                 categoryDao.delete(c);
                 AppController.showCategoryForm();
             }
         } else {
-            GUITools.openDialogOk("Oops", "vide", "aucune catégorie est selectionnée", Alert.AlertType.WARNING);
+            GUITools.openDialogOk("Oops", "vide", "Aucune catégorie est selectionnée", Alert.AlertType.WARNING);
             categoriesTableView.requestFocus();
 
         }
@@ -244,18 +250,18 @@ public class CategoriesController {
         //TODO if textfield is empty, or no Category is selected
         if (c != null) {
             if ((tfcategory.getText().trim()).isEmpty()) {
-                GUITools.openDialogOk("Erreur", "modification échouée", "le champ categorie est vide", Alert.AlertType.WARNING);
+                GUITools.openDialogOk("Erreur", "Modification échouée", "Le champ catégorie est vide", Alert.AlertType.WARNING);
 
                 return;
             }
 
-            if (GUITools.openDialogYesNo("sûr?", null, "êtes-vous sûr de modifier la catégorie: " + c.getTitle() + " à " + (tfcategory.getText()).trim(), Alert.AlertType.CONFIRMATION)) {
+            if (GUITools.openDialogYesNo("sûr?", null, "Etes-vous sûr de modifier la catégorie: " + c.getTitle() + " à " + (tfcategory.getText()).trim(), Alert.AlertType.CONFIRMATION)) {
                 c.setTitle(tfcategory.getText().trim());
                 categoryDao.update(c);
                 AppController.showCategoryForm();
             }
         } else {
-            GUITools.openDialogOk("Oops", "vide", "aucune catégorie est selectionnée", Alert.AlertType.WARNING);
+            GUITools.openDialogOk("Oops", "vide", "Aucune catégorie est selectionnée", Alert.AlertType.WARNING);
             categoriesTableView.requestFocus();
         }
     }

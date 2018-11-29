@@ -37,8 +37,8 @@ public class OrdersController {
         vBox.setSpacing(10);
 
         // Add sale button
-        String iconPath = "resources/avatar.jpg";
-        Button addBtn = GUITools.getButton(GUITools.getImage(iconPath), "Ajouter", 100);
+        String addIconPath = "resources/icons/plus-math-30.png";
+        Button addBtn = GUITools.getButton(GUITools.getImage(addIconPath), "Ajouter", 100);
         addBtn.setOnAction(event -> {
             AppController.showSaleCreateForm();
         });

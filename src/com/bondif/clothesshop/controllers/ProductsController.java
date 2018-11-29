@@ -40,14 +40,16 @@ public class ProductsController {
         vBox.setSpacing(10);
 
         // Add product button
-        String iconPath = "resources/avatar.jpg";
-        Button addBtn = GUITools.getButton(GUITools.getImage(iconPath), "Ajouter", 100);
+        String addIconPath = "resources/icons/plus-math-30.png";
+        String categoriesIconPath = "resources/icons/category-40.png";
+
+        Button addBtn = GUITools.getButton(GUITools.getImage(addIconPath), "Ajouter", 100);
         addBtn.setOnAction(event -> {
             AppController.showCreateProductForm();
         });
 
         //manage Categories
-        Button categoryBtn = GUITools.getButton(GUITools.getImage(iconPath), "catégories", 100);
+        Button categoryBtn = GUITools.getButton(GUITools.getImage(categoriesIconPath), "Catégories", 100);
         categoryBtn.setOnAction(event ->  {
             AppController.showCategoryForm();
         });
