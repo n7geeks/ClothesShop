@@ -132,11 +132,13 @@ public class OrdersController {
     }
 
     private static Pane getOrderLinesSection() {
-        TableView<OrderLine> orderLinesTv = OrderLinesController.getBasicTableView();
+        TableView<OrderLine> orderLinesTv = OrderLinesController.getSaleOrderLinesTv();
         orderLinesTv.setMaxHeight(500);
         orderLinesTv.getColumns().get(0).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 35));
-        orderLinesTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 35));
-        orderLinesTv.getColumns().get(2).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 35));
+        orderLinesTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 15));
+        orderLinesTv.getColumns().get(2).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 10));
+        orderLinesTv.getColumns().get(3).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 12));
+        orderLinesTv.getColumns().get(4).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 10));
         return new VBox(orderLinesTv);
     }
 
@@ -206,29 +208,19 @@ public class OrdersController {
         Collection<OrderLine> orderLines = orderLineDao.findAll(order);
 
         GridPane gridPane = (GridPane)CustomersController.getCustomerInfoPane(order.getCustomer());
-        TableView<OrderLine> orderLineTv = new TableView<>();
-
-        TableColumn<OrderLine, Product> labelCol = new TableColumn<>("Produit");
-        labelCol.setCellValueFactory(new PropertyValueFactory<>("product"));
-
-        TableColumn<OrderLine, Double> priceCol = new TableColumn<>("Prix");
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-
-        TableColumn<OrderLine, Double> qtyCol = new TableColumn<>("Quantité");
-        qtyCol.setCellValueFactory(new PropertyValueFactory<>("qty"));
-
-        TableColumn<OrderLine, Double> totalCol = new TableColumn<>("Total");
-        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
-
-        orderLineTv.getColumns().addAll(labelCol, priceCol, qtyCol, totalCol);
-        orderLineTv.setItems(FXCollections.observableArrayList(orderLines));
+        TableView<OrderLine> orderLinesTv = OrderLinesController.getBasicTableView();
+        orderLinesTv.setItems(FXCollections.observableArrayList(orderLines));
+        orderLinesTv.getColumns().get(0).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 30));
+        orderLinesTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 20));
+        orderLinesTv.getColumns().get(2).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 15));
+        orderLinesTv.getColumns().get(3).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 27));
 
         HBox hBox = new HBox();
         Label totalLabel = new Label("Total : ");
         Label totalValueLabel = new Label(order.getTotal() + "");
         hBox.getChildren().addAll(totalLabel, totalValueLabel);
 
-        VBox vBox = new VBox(gridPane, orderLineTv, hBox);
+        VBox vBox = new VBox(gridPane, orderLinesTv, hBox);
         vBox.setSpacing(10);
         vBox.setPadding(new Insets(10));
 

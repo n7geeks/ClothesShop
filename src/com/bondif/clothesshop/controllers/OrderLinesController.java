@@ -13,7 +13,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class OrderLinesController {
     private static OrderLineDaoImpl orderLineDao;
     private static ObservableList<OrderLine> orderLinesOl;
-    static TableView<OrderLine> orderLinesTv;
 
     static {
         orderLineDao = new OrderLineDaoImpl();
@@ -21,20 +20,28 @@ public class OrderLinesController {
     }
 
     public static TableView<OrderLine> getBasicTableView() {
-        orderLinesTv = new TableView<>();
-        orderLinesOl = getOrderLinesOl();
+        TableView<OrderLine> orderLinesTv = new TableView<>();
 
-        //id column
-        /*TableColumn<Product, String> codeCol = new TableColumn<>("Libellé");
-        codeCol.setCellValueFactory(new PropertyValueFactory<>("label"));*/
+        TableColumn<OrderLine, Product> labelCol = new TableColumn<>("Produit");
+        labelCol.setCellValueFactory(new PropertyValueFactory<>("product"));
 
-        // price column
         TableColumn<OrderLine, Double> priceCol = new TableColumn<>("Prix");
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        // quantity column
-        TableColumn<OrderLine, Integer> qtyCol = new TableColumn<>("Quantité");
+        TableColumn<OrderLine, Double> qtyCol = new TableColumn<>("Quantité");
         qtyCol.setCellValueFactory(new PropertyValueFactory<>("qty"));
+
+        TableColumn<OrderLine, Double> totalCol = new TableColumn<>("Total");
+        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
+
+        orderLinesTv.getColumns().addAll(labelCol, priceCol, qtyCol, totalCol);
+
+        return orderLinesTv;
+    }
+
+    public static TableView<OrderLine> getSaleOrderLinesTv() {
+        TableView<OrderLine> orderLinesTableView = getBasicTableView();
+        orderLinesOl = getOrderLinesOl();
 
         // Edit column
         TableColumn removeOrderLineBtn = new TableColumn<>("Retirer");
@@ -43,10 +50,10 @@ public class OrderLinesController {
             return orderLine;
         }));
 
-        orderLinesTv.getColumns().addAll(priceCol, qtyCol, removeOrderLineBtn);
-        orderLinesTv.setItems(orderLinesOl);
+        orderLinesTableView.getColumns().add(removeOrderLineBtn);
+        orderLinesTableView.setItems(orderLinesOl);
 
-        return orderLinesTv;
+        return orderLinesTableView;
     }
 
     public static void add(OrderLine orderLine) {
