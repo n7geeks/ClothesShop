@@ -16,7 +16,7 @@ public class Database {
 
     private Database() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/clothes_shop", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/clothes_shop?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "root", "");
         } catch (SQLException e) {
             e.printStackTrace();
         }
