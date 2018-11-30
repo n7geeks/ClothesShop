@@ -3,14 +3,16 @@ package com.bondif.clothesshop.models;
 public class Product {
     private Long code;
     private String label;
+    private int qty;
     private double buyingPrice;
     private double sellingPrice;
     private String image;
     private Category category;
 
-    public Product(Long code, String label, double buyingPrice, double sellingPrice, String image, Category category) {
+    public Product(Long code, String label, int qty, double buyingPrice, double sellingPrice, String image, Category category) {
         this.code = code;
         this.label = label;
+        this.qty = qty;
         this.buyingPrice = buyingPrice;
         this.sellingPrice = sellingPrice;
         this.image = image;
@@ -20,6 +22,7 @@ public class Product {
     public Product() {
         this.code = 0L;
         this.label = "";
+        this.qty = 0;
         this.buyingPrice = 0.0;
         this.sellingPrice = 0.0;
         this.image = "";
@@ -32,6 +35,14 @@ public class Product {
 
     public String getLabel() {
         return label;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 
     public double getBuyingPrice() {

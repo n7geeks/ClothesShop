@@ -1,13 +1,18 @@
 package com.bondif.clothesshop.views;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
+import java.awt.dnd.DragSourceContext;
 import java.text.ParseException;
 import java.util.Optional;
 
@@ -75,7 +80,7 @@ public class GUITools {
         dialog.setTitle("Quantité");
         dialog.setHeaderText(null);
         dialog.setContentText("Entrer la quantité : ");
-
+        dialog.setOnCloseRequest(e-> dialog.hide());
         while(true) {
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent()) {

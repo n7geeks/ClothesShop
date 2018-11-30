@@ -27,6 +27,7 @@ public class CustomersController {
         customerDao = new CustomerDaoImpl();
     }
 
+    // createCustomerPane() used to get the main interface for customers
     public static VBox createCustomerPane(){
         CustomersOl = FXCollections.observableArrayList(customerDao.findAll());
         VBox panel = new VBox();
@@ -46,58 +47,77 @@ public class CustomersController {
         searchBar.setMinWidth(200);
         searchBar.setMinHeight(28);
         searchBar.setAlignment(Pos.CENTER);
+        searchBar.setStyle("-fx-border-radius: 30;");
+        searchBar.getStyleClass().add("searchBar");
+        searchBar.getStyleClass().remove("text-field");
 
         customerLbl.setFont(new Font("Century Gothic", 20));
 
         buttonsPanel.setPadding(new Insets(20));
         buttonsPanel.setSpacing(10);
 
-
         HBox.setHgrow(region, Priority.ALWAYS);
 
+        //Adding controls to the buttons panel
         buttonsPanel.getChildren().addAll(addButton, deleteButton, editButton, region, searchBar);
 
         panel.setPadding(new Insets(20));
         panel.setSpacing(10);
         panel.setId("panel");
 
+        // customers list
         TableView<Customer> customersList = new TableView<>();
 
         customersList.setPlaceholder(text);
         customersList.setId("list");
 
+        //Customer id column
         TableColumn<Customer, Long> idColumn = new TableColumn<>("id");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         idColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 5));
+        //idColumn.setPrefWidth(38.5);
 
+        //Customer code column
         TableColumn<Customer, String> codeColumn = new TableColumn<>("code");
         codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
         codeColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
+        //codeColumn.setPrefWidth(77);
 
+        //Customer first name column
         TableColumn<Customer, String> firstNameColumn = new TableColumn<>("Prénom");
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         firstNameColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
+        //firstNameColumn.setPrefWidth(77);
 
+        //Customer last name column
         TableColumn<Customer, String> lastNameColumn = new TableColumn<>("Nom");
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         lastNameColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 10));
+        //lastNameColumn.setPrefWidth(77);
 
+        //Customer phone column
         TableColumn<Customer, String> phoneColumn = new TableColumn<>("Téléphone");
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
         phoneColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 15));
+        //phoneColumn.setPrefWidth(115.5);
 
+        //Customer address column
         TableColumn<Customer, String> addressColumn = new TableColumn<>("Adresse");
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
         addressColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 25));
+        //addressColumn.setPrefWidth(192.5);
 
+        //Customer email column
         TableColumn<Customer, String> emailColumn = new TableColumn<>("Email");
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         emailColumn.prefWidthProperty().bind(customersList.widthProperty().divide(100 / 25));
+        //emailColumn.setPrefWidth(192.5);
 
+        //Adding columns to the table view
         customersList.getColumns().addAll(idColumn, codeColumn, firstNameColumn, lastNameColumn, phoneColumn, addressColumn, emailColumn);
 
+        //Filling the table view from data retrieved from database
         customersList.setItems(CustomersOl);
-
         panel.getChildren().addAll(buttonsPanel, customerLbl, customersList);
 
         //"customer" get the value selected in the tableView when the mouse click event happened
@@ -107,7 +127,7 @@ public class CustomersController {
             }
         });
 
-        //add button event
+        //add button event -> get a form to fill customer details
         addButton.setOnAction(event -> {
             AppController.showCreateCustomerForm();
         });
@@ -153,25 +173,28 @@ public class CustomersController {
             if (searchBar.getText().isEmpty()){
                 customersList.setItems(CustomersOl);
             }else{
-                ObservableList<Customer>  customerList = FXCollections.observableArrayList(customerDao.findAll(searchBar.getText()));
+                ObservableList<Customer> customerList = FXCollections.observableArrayList(customerDao.findAll(searchBar.getText()));
                 customersList.setItems(customerList);
             }
         });
         return panel;
     }
 
+    //getEditPane() is similar as getCustomerPane() using some ids to facilitate the task of editing a customer
     public static Pane getEditPane(){
         Pane editPane = getCustomerPane();
         Long customerId;
 
+        //Retrieving controls from the getCustomerForm() using ids and create a new form
         TextField codeTf = (TextField) editPane.lookup("#c");
         TextField firstNameTf = (TextField) editPane.lookup("#fn");
         TextField lastNameTf = (TextField) editPane.lookup("#ln");
         TextField phoneTf = (TextField) editPane.lookup("#p");
         TextField addressTf = (TextField) editPane.lookup("#a");
         TextField emailTf = (TextField) editPane.lookup("#e");
-        Button submit = (Button) editPane.lookup("#submitBtn");
+        Button validate = (Button) editPane.lookup("#submitBtn");
 
+        //Filling the form by the customer selected from the customers list (customersList) --> createCustomerPane()
         customerId = customer.getId();
         codeTf.setText(customer.getCode());
         firstNameTf.setText(customer.getFirstName());
@@ -180,17 +203,62 @@ public class CustomersController {
         addressTf.setText(customer.getAddress());
         emailTf.setText(customer.getEmail());
 
-        submit.setText("Valider");
+        validate.setText("Valider");
 
-        submit.setOnAction(event -> {
+        //Validate the edits
+        validate.setOnAction(event -> {
             customerDao.update(new Customer(customerId, codeTf.getText(), firstNameTf.getText(), lastNameTf.getText(), phoneTf.getText(),
                     addressTf.getText(), emailTf.getText()));
             AppController.showCustomers();
             //Adding an alert
         });
+
+        validate.setOnAction(event -> {
+
+            boolean isValidInput = false;
+
+            String code = codeTf.getText().trim();
+            if(code.isEmpty()){
+                GUITools.openDialogOk(null, null, "code est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String firstName = firstNameTf.getText().trim();
+            if(firstName.isEmpty()){
+                GUITools.openDialogOk(null, null, "prenom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String lastName = lastNameTf.getText().trim();
+            if(lastName.isEmpty()){
+                GUITools.openDialogOk(null, null, "nom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String phone = phoneTf.getText().trim();
+            if(phone.isEmpty()){
+                GUITools.openDialogOk(null, null, "numero telephone est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String address = addressTf.getText().trim();
+            if(address.isEmpty()){
+                GUITools.openDialogOk(null, null, "adresse est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String email = emailTf.getText().trim();
+            if(email.isEmpty()){
+                GUITools.openDialogOk(null, null, "email est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            if(isValidInput){
+                customerDao.update(new Customer(customerId, codeTf.getText(), firstNameTf.getText(), lastNameTf.getText(), phoneTf.getText(),
+                        addressTf.getText(), emailTf.getText()));
+                AppController.showCustomers();
+            }
+        });
+
         return editPane;
     }
 
+    //getCustomerPane() used to create the form containing the customer details fields
     public static Pane getCustomerPane(){
         GridPane gridPane = new GridPane();
 
@@ -208,6 +276,8 @@ public class CustomersController {
         TextField addressTf = new TextField();
         TextField emailTf = new TextField();
 
+        codeTf.getStyleClass().add("text-field");
+        //Setting ids to use them in the getEditPane() function
         codeTf.setId("c");
         firstNameTf.setId("fn");
         lastNameTf.setId("ln");
@@ -257,16 +327,46 @@ public class CustomersController {
 
         gridPane.getColumnConstraints().addAll(col1, col2);
 
+        // Adding customer into database
         submitButton.setOnAction(event -> {
-            String code = codeTf.getText();
-            String firstName = firstNameTf.getText();
-            String lastName = lastNameTf.getText();
-            String phone = phoneTf.getText();
-            String address = addressTf.getText();
-            String email = emailTf.getText();
-            addCustomerHandler(new Customer(null, code, firstName, lastName, phone, address, email));
+            boolean isValidInput = false;
 
-            AppController.showCustomers();
+            String code = codeTf.getText().trim();
+            if(code.isEmpty()){
+                GUITools.openDialogOk(null, null, "code est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String firstName = firstNameTf.getText().trim();
+            if(firstName.isEmpty()){
+                GUITools.openDialogOk(null, null, "prenom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String lastName = lastNameTf.getText().trim();
+            if(lastName.isEmpty()){
+                GUITools.openDialogOk(null, null, "nom est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String phone = phoneTf.getText().trim();
+            if(phone.isEmpty()){
+                GUITools.openDialogOk(null, null, "numero telephone est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String address = addressTf.getText().trim();
+            if(address.isEmpty()){
+                GUITools.openDialogOk(null, null, "adresse est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+            String email = emailTf.getText().trim();
+            if(email.isEmpty()){
+                GUITools.openDialogOk(null, null, "email est vide!", Alert.AlertType.WARNING);
+                isValidInput = false;
+            }
+
+            if(isValidInput){
+                addCustomerHandler(new Customer(null, code, firstName, lastName, phone, address, email));
+                AppController.showCustomers();
+            }
+
         });
         return gridPane;
     }
