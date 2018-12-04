@@ -60,7 +60,7 @@ public class ProductsController {
 
         //manage Categories
         Button categoryBtn = GUITools.getButton(GUITools.getImage(categoriesIconPath), "Catégories", 100);
-        categoryBtn.setOnAction(event ->  {
+        categoryBtn.setOnAction(event -> {
             AppController.showCategoryForm();
         });
 
@@ -113,7 +113,7 @@ public class ProductsController {
         searchTf.textProperty().addListener((observable, oldValue, newValue) -> {
             newValue = newValue.trim();
             oldValue = oldValue.trim();
-            if(!newValue.equals(oldValue)) {
+            if (!newValue.equals(oldValue)) {
                 System.out.println("searching...");
                 Collection<Product> filterdProducts = new ProductDaoImpl().findAll(newValue);
                 productsOl = FXCollections.observableArrayList(filterdProducts);
@@ -177,55 +177,58 @@ public class ProductsController {
 
         submitBtn.setOnAction(event -> {
             boolean isValidInput = true;
+            String errorMsg = "";
             int qty = 0;
             double sellingPrice = 0.0, buyingPrice = 0.0;
 
             String label = labelTf.getText();
-            if(label.trim().isEmpty()){
-                GUITools.openDialogOk(null, null, "designation est vide!", Alert.AlertType.WARNING);
+            if (label.trim().isEmpty()) {
+                errorMsg += "- La designation est vide!\r\n";
                 isValidInput = false;
             }
 
-            try{
+            try {
                 qty = Integer.parseInt(qtyTf.getText());
-                if(qty <= 0){
-                    GUITools.openDialogOk(null, null, "la qunatité doit être superieure à 0", Alert.AlertType.WARNING);
+                if (qty <= 0) {
+                    errorMsg += "- La qunatité doit être supérieure à 0\r\n";
                     isValidInput = false;
                 }
-            }catch(NumberFormatException ex){
-                GUITools.openDialogOk(null, null, "la qunatité doit être un entier", Alert.AlertType.WARNING);
+            } catch (NumberFormatException ex) {
+                errorMsg += "- la quantité doit être un entier\r\n";
                 isValidInput = false;
             }
-            try{
+            try {
                 buyingPrice = Double.parseDouble(buyPriceTf.getText());
-                if(buyingPrice <= 0){
-                    GUITools.openDialogOk(null, null, "le prix d'achat doit être superieur à 0", Alert.AlertType.WARNING);
+                if (buyingPrice <= 0) {
+                    errorMsg += "- Le prix d'achat doit être superieur à 0\r\n";
                     isValidInput = false;
                 }
-            }catch(NumberFormatException ex){
-                GUITools.openDialogOk(null, null, "le prix d'achat doit être un reel", Alert.AlertType.WARNING);
+            } catch (NumberFormatException ex) {
+                   errorMsg += "- Le prix d'achat doit être un reel\r\n";
                 isValidInput = false;
             }
-            try{
+            try {
                 sellingPrice = Double.parseDouble(sellPriceTf.getText());
-                if(sellingPrice <= 0){
-                    GUITools.openDialogOk(null, null, "le prix de vente doit être superieur à 0", Alert.AlertType.WARNING);
+                if (sellingPrice <= 0) {
+                    errorMsg += "- Le prix de vente doit être superieur à 0\r\n";
                     isValidInput = false;
                 }
-            }catch(NumberFormatException ex){
-                GUITools.openDialogOk(null, null, "le prix de vente doit être un reel", Alert.AlertType.WARNING);
+            } catch (NumberFormatException ex) {
+                errorMsg += "- Le prix de vente doit être un reel\r\n";
                 isValidInput = false;
             }
 
             String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
             Category category = categoriesCb.getValue();
-            if(category == null){
-                GUITools.openDialogOk(null, null, "aucune categorie est selectionnée", Alert.AlertType.WARNING);
+            if (category == null) {
+                errorMsg += "- Aucune categorie est selectionnée\r\n";
                 isValidInput = false;
             }
-            if(isValidInput){
+            if (isValidInput) {
                 addProductHandler(new Product(null, label, qty, buyingPrice, sellingPrice, image, category));
                 AppController.showProducts();
+            } else {
+                GUITools.openDialogOk(null, null, errorMsg, Alert.AlertType.WARNING);
             }
         });
 
@@ -329,7 +332,7 @@ public class ProductsController {
     }
 
     private static Pane getEditForm(Product product) {
-        GridPane gridPane = (GridPane)getCreateForm();
+        GridPane gridPane = (GridPane) getCreateForm();
 
         ImageView imageView = (ImageView) gridPane.getChildren().get(0);
         imageView.setImage(GUITools.getImage(product.getImage()));
@@ -362,57 +365,57 @@ public class ProductsController {
             int qty = 0;
             double buyingPrice = 0.0, sellingPrice = 0.0;
 
-            try{
+            try {
                 code = Long.parseLong(codeTf.getText());
-            }catch(NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 GUITools.openDialogOk(null, null, "le code doit être un entier", Alert.AlertType.WARNING);
                 isValidInput = false;
             }
             String label = labelTf.getText();
-            if(label.trim().isEmpty()){
+            if (label.trim().isEmpty()) {
                 GUITools.openDialogOk(null, null, "designation est vide!", Alert.AlertType.WARNING);
                 isValidInput = false;
             }
 
-            try{
+            try {
                 qty = Integer.parseInt(qtyTf.getText());
-                if(qty <= 0){
+                if (qty <= 0) {
                     GUITools.openDialogOk(null, null, "la qunatité doit être superieure à 0", Alert.AlertType.WARNING);
                     isValidInput = false;
                 }
-            }catch(NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 GUITools.openDialogOk(null, null, "la qunatité doit être un entier", Alert.AlertType.WARNING);
                 isValidInput = false;
             }
-            try{
+            try {
                 buyingPrice = Double.parseDouble(buyingPriceTf.getText());
-                if(buyingPrice <= 0){
+                if (buyingPrice <= 0) {
                     GUITools.openDialogOk(null, null, "le prix d'achat doit être superieur à 0", Alert.AlertType.WARNING);
                     isValidInput = false;
                 }
-            }catch(NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 GUITools.openDialogOk(null, null, "le prix d'achat doit être un reel", Alert.AlertType.WARNING);
                 isValidInput = false;
             }
-            try{
+            try {
                 sellingPrice = Double.parseDouble(sellingPriceTf.getText());
-                if(sellingPrice <= 0){
+                if (sellingPrice <= 0) {
                     GUITools.openDialogOk(null, null, "le prix de vente doit être superieur à 0", Alert.AlertType.WARNING);
                     isValidInput = false;
                 }
-            }catch(NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 GUITools.openDialogOk(null, null, "le prix de vente doit être un reel", Alert.AlertType.WARNING);
                 isValidInput = false;
             }
 
             String image = new File(URI.create(imageView.getImage().getUrl())).getAbsolutePath();
             Category category = categoriesCb.getValue();
-            if(category == null){
+            if (category == null) {
                 GUITools.openDialogOk(null, null, "aucune categorie est selectionnée", Alert.AlertType.WARNING);
                 isValidInput = false;
             }
 
-            if(isValidInput){
+            if (isValidInput) {
                 productDao.update(new Product(code, label, qty, buyingPrice, sellingPrice, image, category));
                 AppController.getRoot().setCenter(getProductPane(productDao.findOne(product.getCode())));
             }
