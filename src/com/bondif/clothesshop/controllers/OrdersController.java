@@ -11,6 +11,8 @@ import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
 import com.bondif.clothesshop.views.utils.Toast;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -18,12 +20,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 public class OrdersController {
     private static ObservableList<Order> ordersOl;
@@ -126,8 +131,42 @@ public class OrdersController {
         //Label clientLabel = new Label("Client : ");
         customersCb = new ComboBox<>(FXCollections.observableArrayList(customerDao.findAll()));
         customersCb.setPromptText(promptText);
-        hBox.getChildren().addAll(customersCb);
+        TextField selectedText = new TextField();
+        hBox.getChildren().addAll(selectedText, customersCb);
 
+        customersCb.setEditable(true);
+
+        /*selectedText.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (customersCb.getEditor().getText().isEmpty()){
+                customersCb.setItems(FXCollections.observableArrayList(customerDao.findAll()));
+            }else{
+                if (customersCb.getItems().size() != 0){
+                    customersCb.show();
+                    customersCb.setItems(FXCollections.observableArrayList(customerDao.findAll(customersCb.getEditor().getText())));
+                }else{
+                    customersCb.hide();
+                }
+            }
+        });*/
+
+        customersCb.getEditor().textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                System.out.println("(" + oldValue + ")-->(" + newValue + ")");
+                if (newValue != "" && newValue.charAt(newValue.length() - 1) != ' ') {
+                    if (customersCb.getEditor().getText().isEmpty()){
+                        customersCb.setItems(FXCollections.observableArrayList(customerDao.findAll()));
+                    }else{
+                        if (customersCb.getItems().size() != 0){
+                            customersCb.show();
+                            customersCb.setItems(FXCollections.observableArrayList(customerDao.findAll(customersCb.getEditor().getText())));
+                        }else{
+                            customersCb.hide();
+                        }
+                    }
+                }
+            }
+        });
         return new VBox(hBox);
     }
 

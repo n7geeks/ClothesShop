@@ -329,7 +329,7 @@ public class CustomersController {
 
         // Adding customer into database
         submitButton.setOnAction(event -> {
-            boolean isValidInput = false;
+            boolean isValidInput = true;
 
             String code = codeTf.getText().trim();
             if(code.isEmpty()){
