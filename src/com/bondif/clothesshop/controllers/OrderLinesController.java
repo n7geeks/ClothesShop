@@ -57,11 +57,14 @@ public class OrderLinesController {
     }
 
     public static void add(OrderLine orderLine) {
+        int index;
         for (OrderLine oL: orderLinesOl) {
             if(oL.getProduct().getCode().equals(orderLine.getProduct().getCode())) {
                 oL.setQty(oL.getQty() + orderLine.getQty());
+                OrderLine orderLine1 = new OrderLine(oL);
+                index = orderLinesOl.indexOf(oL);
                 orderLinesOl.remove(oL);
-                orderLinesOl.add(oL);
+                orderLinesOl.add(index, orderLine1);
                 System.out.println(oL.getQty());
                 return;
             }

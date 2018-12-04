@@ -21,6 +21,14 @@ public class OrderLine {
         this.qty = 0;
     }
 
+    public OrderLine(OrderLine orderLine) {
+        this.id = orderLine.id;
+        this.product = orderLine.product;
+        this.price = orderLine.price;
+        this.qty = orderLine.qty;
+        this.order = orderLine.order;
+    }
+
     public long getId() {
         return id;
     }

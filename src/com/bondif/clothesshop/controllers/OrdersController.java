@@ -29,9 +29,12 @@ public class OrdersController {
     private static ObservableList<Order> ordersOl;
     private static OrderDaoImpl orderDao;
     private static ComboBox<Customer> customersCb;
+    private static TableView<Product> productsTv;
+    private static ObservableList<Product> productOl;
 
     static {
         orderDao = new OrderDaoImpl();
+        productOl = null;
     }
 
     public static Pane getSalesPane() {
@@ -96,6 +99,7 @@ public class OrdersController {
     public static Pane getCreateForm() {
         VBox container = new VBox();
 
+        Pane searchSection = getSearchSection();
         Pane productsSection = getProductsSection();
         Pane orderLinesSection = getOrderLinesSection();
         Pane clientSection = getClientSection();
@@ -114,7 +118,10 @@ public class OrdersController {
         clientSection.setPadding(new Insets(15));
         submitBtnSection.setPadding(new Insets(15));
 
-        container.getChildren().addAll(clientsHbox, productsSection, orderLinesSection, submitHbox);
+        searchSection.setPadding(new Insets(15));
+        searchSection.setMaxWidth(200);
+
+        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
 
         return container;
     }
@@ -143,7 +150,7 @@ public class OrdersController {
     }
 
     private static Pane getProductsSection() {
-        TableView<Product> productsTv = ProductsController.getBasicTableView();
+        productsTv = ProductsController.getBasicTableView();
 
         productsTv.getColumns().get(2).prefWidthProperty().bind(productsTv.widthProperty().divide(100 / 7));
         productsTv.getColumns().get(3).prefWidthProperty().bind(productsTv.widthProperty().divide(100 / 15));
@@ -153,7 +160,7 @@ public class OrdersController {
         addProductCol.setCellFactory(ActionButtonTableCell.forTableColumn("Ajouter", (Product p) -> {
             int qty = GUITools.openQtyTextInputDialog();
             if (qty == -1) return p;
-            if(qty > 0 && p.getQty() >= qty && OrderLinesController.canAddQty(p, qty))
+            if (qty > 0 && p.getQty() >= qty && OrderLinesController.canAddQty(p, qty))
                 OrderLinesController.add(new OrderLine(0, p, p.getSellingPrice(), qty));
             else
                 GUITools.openDialogOk(null, null, "La quantité choisie est plus grande que celle en stock !!", Alert.AlertType.ERROR);
@@ -162,7 +169,7 @@ public class OrdersController {
 
         productsTv.getColumns().add(addProductCol);
 
-        productsTv.setItems(ProductsController.getProductsOl());
+        productsTv.setItems(getProductsOl());
 
         return new VBox(productsTv);
     }
@@ -174,40 +181,73 @@ public class OrdersController {
         submitBtn.setOnAction(event -> {
 
             boolean isValidInput = true;
+            String errorMsg = "";
 
-            if(OrderLinesController.getOrderLinesOl().size() == 0){
-                GUITools.openDialogOk(null, null, "la commande est vide!", Alert.AlertType.WARNING);
+            if (OrderLinesController.getOrderLinesOl().size() == 0) {
+                errorMsg += "- La commande est vide!\r\n";
                 isValidInput = false;
             }
 
-            double sum = 0;
-            for (OrderLine orderLine: OrderLinesController.getOrderLinesOl()) {
-                sum += orderLine.getTotal();
-                orderLine.getProduct().setQty(orderLine.getProduct().getQty() - orderLine.getQty());
-                (new ProductDaoImpl()).updateQty(orderLine.getProduct());
-
-            }
-
-            if(customersCb.getValue() == null){
-                GUITools.openDialogOk(null, null, "aucun Client est selectionné", Alert.AlertType.WARNING);
+            if (customersCb.getValue() == null) {
+                errorMsg += "- Aucun client n'a pas été selectionné\r\n";
                 isValidInput = false;
             }
 
-            if(isValidInput){
+            if (isValidInput) {
+                double sum = 0;
+                for (OrderLine orderLine : OrderLinesController.getOrderLinesOl()) {
+                    sum += orderLine.getTotal();
+                    orderLine.getProduct().setQty(orderLine.getProduct().getQty() - orderLine.getQty());
+                    (new ProductDaoImpl()).updateQty(orderLine.getProduct());
+
+                }
                 orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl()));
+                OrderLinesController.getOrderLinesOl().clear();
                 AppController.showSales();
+            } else {
+                GUITools.openDialogOk(null, null, errorMsg, Alert.AlertType.WARNING);
             }
         });
 
         return new HBox(submitBtn);
     }
 
+    private static Pane getSearchSection() {
+        Pane p = new VBox();
+        // Search
+        //HBox searchContainer = new HBox(20);
+        TextField searchTf = new TextField();
+        searchTf.setPromptText("Rechercher");
+        //searchTf.setMinWidth(300);
+        searchTf.getStyleClass().add("searchBar");
+        searchTf.setMinWidth(200);
+        searchTf.setMinHeight(28);
+        searchTf.setAlignment(Pos.CENTER);
+        searchTf.getStyleClass().remove("text-field");
+
+        searchTf.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.trim();
+            oldValue = oldValue.trim();
+            if (!newValue.equals(oldValue)) {
+                System.out.println("searching...");
+                Collection<Product> filterdProducts = new ProductDaoImpl().findAll(newValue);
+                productOl = FXCollections.observableArrayList(filterdProducts);
+                productsTv.setItems(productOl);
+            }
+        });
+
+        p.getChildren().add(searchTf);
+
+        return p;
+    }
+
+
     public static Pane show(long id) {
         Order order = orderDao.findOne(id);
         OrderLineDaoImpl orderLineDao = new OrderLineDaoImpl();
         Collection<OrderLine> orderLines = orderLineDao.findAll(order);
 
-        GridPane gridPane = (GridPane)CustomersController.getCustomerInfoPane(order.getCustomer());
+        GridPane gridPane = (GridPane) CustomersController.getCustomerInfoPane(order.getCustomer());
         TableView<OrderLine> orderLinesTv = OrderLinesController.getBasicTableView();
         orderLinesTv.setItems(FXCollections.observableArrayList(orderLines));
         orderLinesTv.getColumns().get(0).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 30));
@@ -225,5 +265,9 @@ public class OrdersController {
         vBox.setPadding(new Insets(10));
 
         return vBox;
+    }
+
+    public static ObservableList<Product> getProductsOl() {
+        return productOl == null ? FXCollections.observableArrayList((new ProductDaoImpl()).findAll()) : productOl;
     }
 }
