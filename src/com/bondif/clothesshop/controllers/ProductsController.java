@@ -284,7 +284,9 @@ public class ProductsController {
     }
 
     public static void deleteProductHandler(Product product) {
-        productDao.delete(product);
+        if(GUITools.openDialogYesNo("Supperession d'un produit", null, "Voulez-vous vraiment supprimer ce produit?", Alert.AlertType.WARNING)) {
+            productDao.delete(product);
+        }
         AppController.showProducts();
     }
 
