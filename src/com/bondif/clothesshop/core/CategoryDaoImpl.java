@@ -1,6 +1,8 @@
 package com.bondif.clothesshop.core;
 
 import com.bondif.clothesshop.models.Category;
+import com.bondif.clothesshop.views.GUITools;
+import javafx.scene.control.Alert;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -119,7 +121,7 @@ public class CategoryDaoImpl extends AbstractDao implements Dao<Category> {
 
             pstsmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            GUITools.openDialogOk("Echec de suppression", null, "Impossible de supprimer une categorie qui contient des produits", Alert.AlertType.ERROR);
         }
     }
 }
