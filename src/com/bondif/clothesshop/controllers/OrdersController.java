@@ -10,6 +10,7 @@ import com.bondif.clothesshop.models.OrderLine;
 import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
+import com.bondif.clothesshop.views.utils.ComboBoxAutoComplete;
 import com.bondif.clothesshop.views.utils.Toast;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -132,9 +133,13 @@ public class OrdersController {
         customersCb = new ComboBox<>(FXCollections.observableArrayList(customerDao.findAll()));
         customersCb.setPromptText(promptText);
         TextField selectedText = new TextField();
-        hBox.getChildren().addAll(selectedText, customersCb);
+        //hBox.getChildren().addAll(selectedText, customersCb);
+        hBox.getChildren().addAll(customersCb);
 
-        customersCb.setEditable(true);
+        //customersCb.setEditable(true);
+
+        customersCb.setTooltip(new Tooltip());
+        new ComboBoxAutoComplete<Customer>(customersCb);
 
         /*selectedText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (customersCb.getEditor().getText().isEmpty()){
@@ -148,7 +153,7 @@ public class OrdersController {
                 }
             }
         });*/
-
+        /*
         customersCb.getEditor().textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -167,6 +172,8 @@ public class OrdersController {
                 }
             }
         });
+        */
+
         return new VBox(hBox);
     }
 
