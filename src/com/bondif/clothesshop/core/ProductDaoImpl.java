@@ -2,6 +2,8 @@ package com.bondif.clothesshop.core;
 
 import com.bondif.clothesshop.models.Category;
 import com.bondif.clothesshop.models.Product;
+import com.bondif.clothesshop.views.GUITools;
+import javafx.scene.control.Alert;
 
 import java.io.File;
 import java.io.IOException;
@@ -180,7 +182,7 @@ public class ProductDaoImpl extends AbstractDao implements Dao<Product> {
             pstmt.setLong(1, product.getCode());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            GUITools.openDialogOk("Echec de suppression", null, "Impossible de supprimer un produit qui existe dans une ligne de commande!", Alert.AlertType.ERROR);
         }
     }
 
