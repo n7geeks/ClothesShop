@@ -2,6 +2,7 @@ package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.views.GUIGenerator;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -41,7 +42,6 @@ public class AppController {
         AppController.stage.setScene(scene);
         scene.setFill(Color.TRANSPARENT);
         AppController.stage.initStyle(StageStyle.TRANSPARENT);
-        //scene.getStylesheets().add(AppController.class.getClass().getResource("resources/stylesheet.css").toString());
         AppController.stage.show();
     }
 
