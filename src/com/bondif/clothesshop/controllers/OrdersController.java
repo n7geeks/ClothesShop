@@ -1,13 +1,7 @@
 package com.bondif.clothesshop.controllers;
 
-import com.bondif.clothesshop.core.CustomerDaoImpl;
-import com.bondif.clothesshop.core.OrderDaoImpl;
-import com.bondif.clothesshop.core.OrderLineDaoImpl;
-import com.bondif.clothesshop.core.ProductDaoImpl;
-import com.bondif.clothesshop.models.Customer;
-import com.bondif.clothesshop.models.Order;
-import com.bondif.clothesshop.models.OrderLine;
-import com.bondif.clothesshop.models.Product;
+import com.bondif.clothesshop.core.*;
+import com.bondif.clothesshop.models.*;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
 import com.bondif.clothesshop.views.utils.ComboBoxAutoComplete;
@@ -308,6 +302,7 @@ public class OrdersController {
 
     public static Pane show(long id) {
         Order order = orderDao.findOne(id);
+        Collection<Payment> payments = new PaymentDaoImpl().findAll(order);
         OrderLineDaoImpl orderLineDao = new OrderLineDaoImpl();
         Collection<OrderLine> orderLines = orderLineDao.findAll(order);
 
@@ -321,12 +316,26 @@ public class OrdersController {
 
         HBox hBox = new HBox();
         Label totalLabel = new Label("Total : ");
-        Label totalValueLabel = new Label(order.getTotal() + "");
+        Label totalValueLabel = new Label(order.getTotal() + " Dh");
         hBox.getChildren().addAll(totalLabel, totalValueLabel);
 
-        VBox vBox = new VBox(gridPane, orderLinesTv, hBox);
+        double paid = 0.0;
+        for (Payment payment : payments)
+            paid += payment.getAmount();
+
+        HBox rest = new HBox();
+        Label restLabel = new Label("Reste : ");
+        Label restValueLabel = new Label((order.getTotal() - paid) + " Dh");
+        rest.getChildren().addAll(restLabel, restValueLabel);
+
+        TableView<Payment> paymentsTv = PaymentsController.getBasicTv();
+        paymentsTv.setItems(FXCollections.observableArrayList(payments));
+        paymentsTv.getColumns().get(0).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
+        paymentsTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 50));
+
+        VBox vBox = new VBox(gridPane, orderLinesTv, hBox, rest, paymentsTv);
         vBox.setSpacing(10);
-        vBox.setPadding(new Insets(10));
+        vBox.setPadding(new Insets(5));
 
         return vBox;
     }

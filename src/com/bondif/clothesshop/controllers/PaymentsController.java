@@ -29,6 +29,22 @@ public class PaymentsController {
         addPaymentBtn = new Button("Ajouter");
     }
 
+    public static TableView<Payment> getBasicTv() {
+        TableView<Payment> paymentsTv = new TableView<>();
+
+        // CreatedAt column
+        TableColumn<Payment, LocalDateTime> createdAtCol = new TableColumn<>("Date");
+        createdAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+
+        // Amount column
+        TableColumn<Payment, Double> amountCol = new TableColumn<>("Montant (Dh)");
+        amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        paymentsTv.getColumns().addAll(createdAtCol, amountCol);
+
+        return paymentsTv;
+    }
+
     public static Pane getPaymentsForm() {
         VBox vBox = new VBox();
 
@@ -57,15 +73,7 @@ public class PaymentsController {
             getPaymentsOl().add(payment);
         });
 
-        TableView<Payment> paymentsTv = new TableView<>();
-
-        // CreatedAt column
-        TableColumn<Payment, LocalDateTime> createdAtCol = new TableColumn<>("Date");
-        createdAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-
-        // Amount column
-        TableColumn<Payment, Double> amountCol = new TableColumn<>("Montant");
-        amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        TableView<Payment> paymentsTv = getBasicTv();
 
         // Remove column
         TableColumn removePaymentCol = new TableColumn<>("Retirer");
@@ -74,7 +82,7 @@ public class PaymentsController {
             return payment;
         }));
 
-        paymentsTv.getColumns().addAll(createdAtCol, amountCol, removePaymentCol);
+        paymentsTv.getColumns().add(removePaymentCol);
         paymentsOl = getPaymentsOl();
         paymentsTv.setItems(paymentsOl);
 

@@ -8,6 +8,13 @@ public class Payment {
     private LocalDateTime createdAt;
     private Order order;
 
+    public Payment() {
+        this.id = 0;
+        this.amount = 0.0;
+        this.createdAt = null;
+        this.order = null;
+    }
+
     public Payment(long id, double amount, LocalDateTime createdAt, Order order) {
         this.id = id;
         this.amount = amount;
