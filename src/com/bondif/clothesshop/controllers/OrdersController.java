@@ -110,6 +110,7 @@ public class OrdersController {
         Pane orderLinesSection = getOrderLinesSection();
         Pane clientSection = getClientSection();
         Pane submitBtnSection = getSubmitBtnSection();
+        Pane paymentsSection = PaymentsController.getPaymentsForm();
         Region region = new Region();
         HBox clientsHbox = new HBox();
         HBox submitHbox = new HBox();
@@ -127,7 +128,14 @@ public class OrdersController {
         searchSection.setPadding(new Insets(15));
         searchSection.setMaxWidth(200);
 
-        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
+        HBox orderLinesAndPayments = new HBox(orderLinesSection, paymentsSection);
+
+        HBox.setHgrow(orderLinesSection, Priority.ALWAYS);
+        HBox.setHgrow(paymentsSection, Priority.ALWAYS);
+        orderLinesSection.setMaxWidth(Double.MAX_VALUE);
+        paymentsSection.setMaxWidth(Double.MAX_VALUE);
+
+        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesAndPayments, submitHbox);
 
         return container;
     }
@@ -185,7 +193,7 @@ public class OrdersController {
     }
 
     private static Pane getOrderLinesSection() {
-        TableView<OrderLine> orderLinesTv = OrderLinesController.getSaleOrderLinesTv();
+        TableView<OrderLine> orderLinesTv = OrderLinesController.getSaleOrderLinesTv(true);
         orderLinesTv.setMaxHeight(500);
         orderLinesTv.getColumns().get(0).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 35));
         orderLinesTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 15));
@@ -228,6 +236,15 @@ public class OrdersController {
 
             boolean isValidInput = true;
             String errorMsg = "";
+            double total = 0;
+            for (OrderLine orderLine : OrderLinesController.getOrderLinesOl())
+                total += orderLine.getTotal();
+
+            System.out.println(total);
+            if(total < PaymentsController.getCalculatedTotal()) {
+                errorMsg += "- Impossible de payer un montant plus grand que le total!\r\n";
+                isValidInput = false;
+            }
 
             if (OrderLinesController.getOrderLinesOl().size() == 0) {
                 errorMsg += "- La commande est vide!\r\n";
@@ -247,8 +264,9 @@ public class OrdersController {
                     (new ProductDaoImpl()).updateQty(orderLine.getProduct());
 
                 }
-                orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl()));
+                orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl(), PaymentsController.getPaymentsOl()));
                 OrderLinesController.getOrderLinesOl().clear();
+                PaymentsController.getPaymentsOl().clear();
                 AppController.showSales();
             } else {
                 GUITools.openDialogOk(null, null, errorMsg, Alert.AlertType.WARNING);

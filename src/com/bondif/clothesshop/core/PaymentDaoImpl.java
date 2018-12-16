@@ -3,7 +3,11 @@ package com.bondif.clothesshop.core;
 import com.bondif.clothesshop.models.Payment;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.LinkedList;
 
 public class PaymentDaoImpl extends AbstractDao implements Dao<Payment> {
     @Override
@@ -13,7 +17,8 @@ public class PaymentDaoImpl extends AbstractDao implements Dao<Payment> {
 
     @Override
     public Collection<Payment> findAll() {
-        return null;
+        Collection<Payment> payments = new LinkedList<>();
+        return payments;
     }
 
     @Override
@@ -23,7 +28,17 @@ public class PaymentDaoImpl extends AbstractDao implements Dao<Payment> {
 
     @Override
     public void create(Payment payment) {
+        PreparedStatement pstsmt;
 
+        String sql = "INSERT INTO payments VALUES (NULL, ?, ?, now())";
+        try {
+            pstsmt = getConnection().prepareStatement(sql);
+            pstsmt.setLong(1, payment.getOrder().getId());
+            pstsmt.setDouble(2, payment.getAmount());
+            pstsmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
