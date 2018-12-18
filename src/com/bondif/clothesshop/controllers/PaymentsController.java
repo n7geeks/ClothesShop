@@ -1,6 +1,7 @@
 package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.core.PaymentDaoImpl;
+import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.models.Payment;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
@@ -13,6 +14,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 public class PaymentsController {
     private static ObservableList<Payment> paymentsOl;
@@ -20,13 +22,19 @@ public class PaymentsController {
     private static Label totalVal;
     private static TextField amountTf;
     private static Button addPaymentBtn;
+    private static PaymentDaoImpl paymentDao;
 
     static {
+        paymentDao = new PaymentDaoImpl();
         paymentsOl = null;
         calculatedTotal = 0.0;
         totalVal = new Label(calculatedTotal + " Dhs");
         amountTf = new TextField();
         addPaymentBtn = new Button("Ajouter");
+    }
+
+    public static void addPayments(Collection<Payment> payments) {
+        for (Payment payment : payments) paymentDao.create(payment);
     }
 
     public static TableView<Payment> getBasicTv() {

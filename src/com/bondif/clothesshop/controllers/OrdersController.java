@@ -31,10 +31,13 @@ public class OrdersController {
     private static ComboBox<Customer> customersCb;
     private static TableView<Product> productsTv;
     private static ObservableList<Product> productOl;
+    private static Label restValueLabel;
+    private static double rest;
 
     static {
         orderDao = new OrderDaoImpl();
         productOl = null;
+        rest = 0.0;
     }
 
     public static Pane getSalesPane() {
@@ -299,7 +302,6 @@ public class OrdersController {
         return p;
     }
 
-
     public static Pane show(long id) {
         Order order = orderDao.findOne(id);
         Collection<Payment> payments = new PaymentDaoImpl().findAll(order);
@@ -314,26 +316,90 @@ public class OrdersController {
         orderLinesTv.getColumns().get(2).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 15));
         orderLinesTv.getColumns().get(3).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 27));
 
-        HBox hBox = new HBox();
+        HBox moneyBox = new HBox();
         Label totalLabel = new Label("Total : ");
         Label totalValueLabel = new Label(order.getTotal() + " Dh");
-        hBox.getChildren().addAll(totalLabel, totalValueLabel);
+        moneyBox.getChildren().addAll(totalLabel, totalValueLabel);
 
         double paid = 0.0;
         for (Payment payment : payments)
             paid += payment.getAmount();
 
-        HBox rest = new HBox();
+        rest = order.getTotal() - paid;
         Label restLabel = new Label("Reste : ");
-        Label restValueLabel = new Label((order.getTotal() - paid) + " Dh");
-        rest.getChildren().addAll(restLabel, restValueLabel);
+        restValueLabel = new Label(rest + " Dh");
+        moneyBox.getChildren().addAll(restLabel, restValueLabel);
+        moneyBox.setSpacing(10);
 
         TableView<Payment> paymentsTv = PaymentsController.getBasicTv();
         paymentsTv.setItems(FXCollections.observableArrayList(payments));
         paymentsTv.getColumns().get(0).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
-        paymentsTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 50));
+        paymentsTv.getColumns().get(1).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
 
-        VBox vBox = new VBox(gridPane, orderLinesTv, hBox, rest, paymentsTv);
+        // add payments
+        TextField amountTf = new TextField();
+        Button addPaymentBtn = new Button("Ajouter traite");
+        Button saveNewPayments = new Button("Enregistrer");
+        saveNewPayments.setAlignment(Pos.CENTER_RIGHT);
+        saveNewPayments.setDisable(true);
+
+        TableView<Payment> newPaymentsTv;
+        if (rest != 0) {
+            System.out.println("rest is not 0");
+            newPaymentsTv = PaymentsController.getBasicTv();
+
+            // Remove new payment column
+            TableColumn removeNewPaymentCol = new TableColumn<>("Retirer");
+            removeNewPaymentCol.setCellFactory(ActionButtonTableCell.forTableColumn("Retirer", (Payment payment) -> {
+                newPaymentsTv.getItems().remove(payment);
+                if(newPaymentsTv.getItems().size() == 0) saveNewPayments.setDisable(true);
+                return payment;
+            }));
+
+            newPaymentsTv.getColumns().add(removeNewPaymentCol);
+            newPaymentsTv.setItems(FXCollections.observableArrayList());
+            newPaymentsTv.getColumns().get(0).prefWidthProperty().bind(newPaymentsTv.widthProperty().divide(100 / 30));
+            newPaymentsTv.getColumns().get(1).prefWidthProperty().bind(newPaymentsTv.widthProperty().divide(100 / 30));
+            newPaymentsTv.getColumns().get(2).prefWidthProperty().bind(newPaymentsTv.widthProperty().divide(100 / 30));
+
+            addPaymentBtn.setOnAction(e -> {
+                try {
+                    double amount = Double.parseDouble(amountTf.getText());
+
+                    if(amount <= 0) {
+                        GUITools.openDialogOk("Erreur de saisie", null, "Le montant de la traite doit etre strictement positif!", Alert.AlertType.ERROR);
+                        return;
+                    }
+
+                    if(amount > rest) {
+                        GUITools.openDialogOk("Erreur de saisie", null, "Le montant de la traite doit etre inférieur ou égal au reste!", Alert.AlertType.ERROR);
+                        return;
+                    }
+
+                    Payment payment = new Payment(0, amount, LocalDateTime.now(), order);
+                    newPaymentsTv.getItems().add(payment);
+                    saveNewPayments.setDisable(false);
+                    rest -= amount;
+                    restValueLabel.setText(rest + " Dh");
+                } catch (NumberFormatException e1) {
+                    GUITools.openDialogOk("Erreur de saisie", null, "Veuillez entrer le montant en chiffre", Alert.AlertType.ERROR);
+                }
+                amountTf.clear();
+            });
+            saveNewPayments.setOnAction(e -> {
+                PaymentsController.addPayments(newPaymentsTv.getItems());
+                AppController.showOrder(order.getId());
+            });
+        } else {
+            newPaymentsTv = null;
+        }
+
+        HBox addPaymentHBox = new HBox(amountTf, addPaymentBtn, saveNewPayments);
+
+        VBox vBox = new VBox(gridPane, orderLinesTv, moneyBox, newPaymentsTv == null ? paymentsTv : new HBox(newPaymentsTv, paymentsTv));
+        if(newPaymentsTv != null) {
+            vBox.getChildren().add(addPaymentHBox);
+        }
         vBox.setSpacing(10);
         vBox.setPadding(new Insets(5));
 
