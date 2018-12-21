@@ -6,6 +6,7 @@ import com.bondif.clothesshop.models.Category;
 import com.bondif.clothesshop.models.Product;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
+import com.bondif.clothesshop.views.utils.ComboBoxAutoComplete;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -181,6 +182,7 @@ public class ProductsController {
         sellPriceTf.setPromptText("Prix de vente");
         ComboBox<Category> categoriesCb = new ComboBox<>(FXCollections.observableArrayList(new CategoryDaoImpl().findAll()));
         categoriesCb.setPromptText("Choisissez une catégorie");
+        new ComboBoxAutoComplete<Category>(categoriesCb);
 
         String submitIconBtn = "resources/icons/checkmark-40.png";
         Button submitBtn = GUITools.getButton(GUITools.getImage(submitIconBtn), "Créer", 100);
@@ -462,6 +464,7 @@ public class ProductsController {
         Text buyingPriceTxt = new Text(product.getBuyingPrice() + "");
         Text sellingPriceTxt = new Text(product.getSellingPrice() + "");
         Text categoryTxt = new Text(product.getCategory().getTitle());
+
 
         gridPane.add(codeLabelTxt, 0, 1);
         gridPane.add(labelLabelTxt, 0, 2);

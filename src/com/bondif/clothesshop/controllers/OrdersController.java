@@ -1,13 +1,7 @@
 package com.bondif.clothesshop.controllers;
 
-import com.bondif.clothesshop.core.CustomerDaoImpl;
-import com.bondif.clothesshop.core.OrderDaoImpl;
-import com.bondif.clothesshop.core.OrderLineDaoImpl;
-import com.bondif.clothesshop.core.ProductDaoImpl;
-import com.bondif.clothesshop.models.Customer;
-import com.bondif.clothesshop.models.Order;
-import com.bondif.clothesshop.models.OrderLine;
-import com.bondif.clothesshop.models.Product;
+import com.bondif.clothesshop.core.*;
+import com.bondif.clothesshop.models.*;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
 import com.bondif.clothesshop.views.utils.ComboBoxAutoComplete;
@@ -37,10 +31,13 @@ public class OrdersController {
     private static ComboBox<Customer> customersCb;
     private static TableView<Product> productsTv;
     private static ObservableList<Product> productOl;
+    private static Label restValueLabel;
+    private static double rest;
 
     static {
         orderDao = new OrderDaoImpl();
         productOl = null;
+        rest = 0.0;
     }
 
     public static Pane getSalesPane() {
@@ -110,6 +107,7 @@ public class OrdersController {
         Pane orderLinesSection = getOrderLinesSection();
         Pane clientSection = getClientSection();
         Pane submitBtnSection = getSubmitBtnSection();
+        Pane paymentsSection = PaymentsController.getPaymentsForm();
         Region region = new Region();
         HBox clientsHbox = new HBox();
         HBox submitHbox = new HBox();
@@ -129,6 +127,14 @@ public class OrdersController {
 
 
         container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
+        HBox orderLinesAndPayments = new HBox(orderLinesSection, paymentsSection);
+
+        HBox.setHgrow(orderLinesSection, Priority.ALWAYS);
+        HBox.setHgrow(paymentsSection, Priority.ALWAYS);
+        orderLinesSection.setMaxWidth(Double.MAX_VALUE);
+        paymentsSection.setMaxWidth(Double.MAX_VALUE);
+
+        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesAndPayments, submitHbox);
 
         return container;
     }
@@ -186,7 +192,7 @@ public class OrdersController {
     }
 
     private static Pane getOrderLinesSection() {
-        TableView<OrderLine> orderLinesTv = OrderLinesController.getSaleOrderLinesTv();
+        TableView<OrderLine> orderLinesTv = OrderLinesController.getSaleOrderLinesTv(true);
         orderLinesTv.setMaxHeight(500);
         orderLinesTv.getColumns().get(0).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 35));
         orderLinesTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 15));
@@ -229,6 +235,15 @@ public class OrdersController {
 
             boolean isValidInput = true;
             String errorMsg = "";
+            double total = 0;
+            for (OrderLine orderLine : OrderLinesController.getOrderLinesOl())
+                total += orderLine.getTotal();
+
+            System.out.println(total);
+            if(total < PaymentsController.getCalculatedTotal()) {
+                errorMsg += "- Impossible de payer un montant plus grand que le total!\r\n";
+                isValidInput = false;
+            }
 
             if (OrderLinesController.getOrderLinesOl().size() == 0) {
                 errorMsg += "- La commande est vide!\r\n";
@@ -248,8 +263,9 @@ public class OrdersController {
                     (new ProductDaoImpl()).updateQty(orderLine.getProduct());
 
                 }
-                orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl()));
+                orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl(), PaymentsController.getPaymentsOl()));
                 OrderLinesController.getOrderLinesOl().clear();
+                PaymentsController.getPaymentsOl().clear();
                 AppController.showSales();
             } else {
                 GUITools.openDialogOk(null, null, errorMsg, Alert.AlertType.WARNING);
@@ -288,9 +304,9 @@ public class OrdersController {
         return p;
     }
 
-
     public static Pane show(long id) {
         Order order = orderDao.findOne(id);
+        Collection<Payment> payments = new PaymentDaoImpl().findAll(order);
         OrderLineDaoImpl orderLineDao = new OrderLineDaoImpl();
         Collection<OrderLine> orderLines = orderLineDao.findAll(order);
 
@@ -302,14 +318,92 @@ public class OrdersController {
         orderLinesTv.getColumns().get(2).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 15));
         orderLinesTv.getColumns().get(3).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 27));
 
-        HBox hBox = new HBox();
+        HBox moneyBox = new HBox();
         Label totalLabel = new Label("Total : ");
-        Label totalValueLabel = new Label(order.getTotal() + "");
-        hBox.getChildren().addAll(totalLabel, totalValueLabel);
+        Label totalValueLabel = new Label(order.getTotal() + " Dh");
+        moneyBox.getChildren().addAll(totalLabel, totalValueLabel);
 
-        VBox vBox = new VBox(gridPane, orderLinesTv, hBox);
+        double paid = 0.0;
+        for (Payment payment : payments)
+            paid += payment.getAmount();
+
+        rest = order.getTotal() - paid;
+        Label restLabel = new Label("Reste : ");
+        restValueLabel = new Label(rest + " Dh");
+        moneyBox.getChildren().addAll(restLabel, restValueLabel);
+        moneyBox.setSpacing(10);
+
+        TableView<Payment> paymentsTv = PaymentsController.getBasicTv();
+        paymentsTv.setItems(FXCollections.observableArrayList(payments));
+        paymentsTv.getColumns().get(0).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
+        paymentsTv.getColumns().get(1).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
+
+        // add payments
+        TextField amountTf = new TextField();
+        Button addPaymentBtn = new Button("Ajouter traite");
+        Button saveNewPayments = new Button("Enregistrer");
+        saveNewPayments.setAlignment(Pos.CENTER_RIGHT);
+        saveNewPayments.setDisable(true);
+
+        TableView<Payment> newPaymentsTv;
+        if (rest != 0) {
+            System.out.println("rest is not 0");
+            newPaymentsTv = PaymentsController.getBasicTv();
+
+            // Remove new payment column
+            TableColumn removeNewPaymentCol = new TableColumn<>("Retirer");
+            removeNewPaymentCol.setCellFactory(ActionButtonTableCell.forTableColumn("Retirer", (Payment payment) -> {
+                newPaymentsTv.getItems().remove(payment);
+                if(newPaymentsTv.getItems().size() == 0) saveNewPayments.setDisable(true);
+                return payment;
+            }));
+
+            newPaymentsTv.getColumns().add(removeNewPaymentCol);
+            newPaymentsTv.setItems(FXCollections.observableArrayList());
+            newPaymentsTv.getColumns().get(0).prefWidthProperty().bind(newPaymentsTv.widthProperty().divide(100 / 30));
+            newPaymentsTv.getColumns().get(1).prefWidthProperty().bind(newPaymentsTv.widthProperty().divide(100 / 30));
+            newPaymentsTv.getColumns().get(2).prefWidthProperty().bind(newPaymentsTv.widthProperty().divide(100 / 30));
+
+            addPaymentBtn.setOnAction(e -> {
+                try {
+                    double amount = Double.parseDouble(amountTf.getText());
+
+                    if(amount <= 0) {
+                        GUITools.openDialogOk("Erreur de saisie", null, "Le montant de la traite doit etre strictement positif!", Alert.AlertType.ERROR);
+                        return;
+                    }
+
+                    if(amount > rest) {
+                        GUITools.openDialogOk("Erreur de saisie", null, "Le montant de la traite doit etre inférieur ou égal au reste!", Alert.AlertType.ERROR);
+                        return;
+                    }
+
+                    Payment payment = new Payment(0, amount, LocalDateTime.now(), order);
+                    newPaymentsTv.getItems().add(payment);
+                    saveNewPayments.setDisable(false);
+                    rest -= amount;
+                    restValueLabel.setText(rest + " Dh");
+                } catch (NumberFormatException e1) {
+                    GUITools.openDialogOk("Erreur de saisie", null, "Veuillez entrer le montant en chiffre", Alert.AlertType.ERROR);
+                }
+                amountTf.clear();
+            });
+            saveNewPayments.setOnAction(e -> {
+                PaymentsController.addPayments(newPaymentsTv.getItems());
+                AppController.showOrder(order.getId());
+            });
+        } else {
+            newPaymentsTv = null;
+        }
+
+        HBox addPaymentHBox = new HBox(amountTf, addPaymentBtn, saveNewPayments);
+
+        VBox vBox = new VBox(gridPane, orderLinesTv, moneyBox, newPaymentsTv == null ? paymentsTv : new HBox(newPaymentsTv, paymentsTv));
+        if(newPaymentsTv != null) {
+            vBox.getChildren().add(addPaymentHBox);
+        }
         vBox.setSpacing(10);
-        vBox.setPadding(new Insets(10));
+        vBox.setPadding(new Insets(5));
 
         return vBox;
     }

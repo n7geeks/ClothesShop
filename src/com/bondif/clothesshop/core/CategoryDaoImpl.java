@@ -123,6 +123,7 @@ public class CategoryDaoImpl extends AbstractDao implements Dao<Category> {
         } catch (SQLException e) {
             //e.printStackTrace();
             GUITools.openDialogOk("Suppression échoué", null, "Impossible de supprimer cette catégorie, car elle contient des produits", Alert.AlertType.ERROR);
+            GUITools.openDialogOk("Echec de suppression", null, "Impossible de supprimer une categorie qui contient des produits", Alert.AlertType.ERROR);
         }
     }
 }

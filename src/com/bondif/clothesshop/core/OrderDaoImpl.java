@@ -3,6 +3,7 @@ package com.bondif.clothesshop.core;
 import com.bondif.clothesshop.models.Customer;
 import com.bondif.clothesshop.models.Order;
 import com.bondif.clothesshop.models.OrderLine;
+import com.bondif.clothesshop.models.Payment;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -91,6 +92,7 @@ public class OrderDaoImpl extends AbstractDao implements Dao<Order> {
     @Override
     public void create(Order order) {
         OrderLineDaoImpl orderLineDao = new OrderLineDaoImpl();
+        PaymentDaoImpl paymentDao = new PaymentDaoImpl();
         PreparedStatement pstsmt;
 
         String query = "INSERT INTO orders VALUES (NULL, ?, ?, now())";
@@ -107,6 +109,11 @@ public class OrderDaoImpl extends AbstractDao implements Dao<Order> {
             for (OrderLine orderLine: order.getOrderLines()) {
                 orderLine.setOrder(order);
                 orderLineDao.create(orderLine);
+            }
+
+            for (Payment payment : order.getPayments()) {
+                payment.setOrder(order);
+                paymentDao.create(payment);
             }
         } catch (SQLException e) {
             e.printStackTrace();

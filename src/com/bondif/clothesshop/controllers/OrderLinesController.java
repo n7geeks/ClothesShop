@@ -39,7 +39,7 @@ public class OrderLinesController {
         return orderLinesTv;
     }
 
-    public static TableView<OrderLine> getSaleOrderLinesTv() {
+    public static TableView<OrderLine> getSaleOrderLinesTv(boolean withPayment) {
         TableView<OrderLine> orderLinesTableView = getBasicTableView();
         orderLinesOl = getOrderLinesOl();
 
@@ -47,6 +47,9 @@ public class OrderLinesController {
         TableColumn removeOrderLineBtn = new TableColumn<>("Retirer");
         removeOrderLineBtn.setCellFactory(ActionButtonTableCell.forTableColumn("Retirer", (OrderLine orderLine) -> {
             orderLinesOl.remove(orderLine);
+            if (withPayment) {
+                PaymentsController.removeFromTotal(orderLine.getTotal());
+            }
             return orderLine;
         }));
 
@@ -58,6 +61,7 @@ public class OrderLinesController {
 
     public static void add(OrderLine orderLine) {
         int index;
+        PaymentsController.addToTotal(orderLine.getTotal());
         for (OrderLine oL: orderLinesOl) {
             if(oL.getProduct().getCode().equals(orderLine.getProduct().getCode())) {
                 oL.setQty(oL.getQty() + orderLine.getQty());

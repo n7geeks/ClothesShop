@@ -9,20 +9,24 @@ public class Order {
     private double total;
     private LocalDateTime createdAt;
     private Collection<OrderLine> orderLines;
+    private Collection<Payment> payments;
 
     public Order(long id, Customer customer, double total, LocalDateTime createdAt) {
         this.id = id;
         this.customer = customer;
         this.total = total;
         this.createdAt = createdAt;
+        this.orderLines = null;
+        this.payments = null;
     }
 
-    public Order(long id, Customer customer, double total, LocalDateTime createdAt, Collection<OrderLine> orderLines) {
+    public Order(long id, Customer customer, double total, LocalDateTime createdAt, Collection<OrderLine> orderLines, Collection<Payment> payments) {
         this.id = id;
         this.customer = customer;
         this.total = total;
         this.createdAt = createdAt;
         this.orderLines = orderLines;
+        this.payments = payments;
     }
 
     public Order() {
@@ -31,6 +35,7 @@ public class Order {
         this.total = 0;
         this.createdAt = null;
         this.orderLines = null;
+        this.payments = null;
     }
 
     public long getId() {
@@ -69,7 +74,7 @@ public class Order {
         return orderLines;
     }
 
-    public void setOrderLines(Collection<OrderLine> orderLines) {
-        this.orderLines = orderLines;
+    public Collection<Payment> getPayments() {
+        return payments;
     }
 }
