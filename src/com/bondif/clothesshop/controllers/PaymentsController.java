@@ -93,12 +93,9 @@ public class PaymentsController {
         paymentsTv.getColumns().add(removePaymentCol);
         paymentsOl = getPaymentsOl();
         paymentsTv.setItems(paymentsOl);
+        paymentsTv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         vBox.getChildren().addAll(new HBox(total, totalVal), new HBox(state, stateVal), new HBox(amount, amountTf, addPaymentBtn), paymentsTv);
-
-        paymentsTv.getColumns().get(0).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 20));
-        paymentsTv.getColumns().get(1).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
-        paymentsTv.getColumns().get(2).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 30));
 
         return vBox;
     }

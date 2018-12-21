@@ -100,7 +100,7 @@ public class OrdersController {
     }
 
     public static Pane getCreateForm() {
-        VBox container = new VBox();
+        GridPane container = new GridPane();
 
         Pane searchSection = getSearchSection();
         Pane productsSection = getProductsSection();
@@ -111,8 +111,6 @@ public class OrdersController {
         Region region = new Region();
         HBox clientsHbox = new HBox();
         HBox submitHbox = new HBox();
-
-        HBox.setHgrow(region, Priority.ALWAYS);
 
         clientsHbox.getChildren().addAll(region, clientSection);
         submitHbox.getChildren().addAll(region, submitBtnSection);
@@ -125,16 +123,18 @@ public class OrdersController {
         searchSection.setPadding(new Insets(15));
         searchSection.setMaxWidth(200);
 
-
         container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
-        HBox orderLinesAndPayments = new HBox(orderLinesSection, paymentsSection);
+        //HBox orderLinesAndPayments = new HBox(orderLinesSection, paymentsSection);
+        GridPane orderLinesAndPayments = new GridPane();
+        orderLinesAndPayments.add(orderLinesSection, 0, 0);
+        orderLinesAndPayments.add(paymentsSection, 0, 1);
 
-        HBox.setHgrow(orderLinesSection, Priority.ALWAYS);
-        HBox.setHgrow(paymentsSection, Priority.ALWAYS);
-        orderLinesSection.setMaxWidth(Double.MAX_VALUE);
-        paymentsSection.setMaxWidth(Double.MAX_VALUE);
+        container.add(clientsHbox, 0, 0);
+        container.add(searchSection, 0, 1);
+        container.add(productsSection, 0, 2, 1, 3);
+        container.add(submitBtnSection, 0, 5, 2, 1);
 
-        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesAndPayments, submitHbox);
+        container.add(orderLinesAndPayments, 1, 0, 1, 5);
 
         return container;
     }
@@ -194,22 +194,33 @@ public class OrdersController {
     private static Pane getOrderLinesSection() {
         TableView<OrderLine> orderLinesTv = OrderLinesController.getSaleOrderLinesTv(true);
         orderLinesTv.setMaxHeight(500);
-        orderLinesTv.getColumns().get(0).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 35));
-        orderLinesTv.getColumns().get(1).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 15));
-        orderLinesTv.getColumns().get(2).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 10));
-        orderLinesTv.getColumns().get(3).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 12));
-        orderLinesTv.getColumns().get(4).prefWidthProperty().bind(orderLinesTv.widthProperty().divide(100 / 10));
+        orderLinesTv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         return new VBox(orderLinesTv);
     }
 
-    private static Pane getProductsSection() {
-        productsTv = ProductsController.getBasicTableView();
+    private static TableView<Product> getMinimalProductsTv() {
+        TableView<Product> productsTableView = new TableView<>();
 
-        productsTv.getColumns().get(2).prefWidthProperty().bind(productsTv.widthProperty().divide(100 / 7));
-        productsTv.getColumns().get(3).prefWidthProperty().bind(productsTv.widthProperty().divide(100 / 15));
+        // label column
+        TableColumn<Product, String> labelColumn = new TableColumn<>("Désignation");
+        labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
+
+        // sellPrice column
+        TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
+        sellPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+
+        productsTableView.getColumns().addAll(labelColumn, sellPriceColumn);
+
+        return productsTableView;
+    }
+
+    private static Pane getProductsSection() {
+        productsTv = OrdersController.getMinimalProductsTv();
+        productsTv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         // "add product to order" column
         TableColumn addProductCol = new TableColumn<>("Ajouter");
-        addProductCol.prefWidthProperty().bind(productsTv.widthProperty().divide(100 / 25));
         addProductCol.setCellFactory(ActionButtonTableCell.forTableColumn("Ajouter", (Product p) -> {
             int qty = GUITools.openQtyTextInputDialog();
             if (qty == -1) return p;
