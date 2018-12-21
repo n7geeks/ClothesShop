@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 29, 2018 at 08:14 PM
+-- Generation Time: Dec 21, 2018 at 10:01 AM
 -- Server version: 5.7.19
 -- PHP Version: 7.1.9
 
@@ -33,16 +33,14 @@ CREATE TABLE IF NOT EXISTS `categories` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `categories`
 --
 
 INSERT INTO `categories` (`id`, `title`) VALUES
-(1, 'Televisions'),
-(5, 'Laptops'),
-(6, 'test');
+(2, 'Jackets');
 
 -- --------------------------------------------------------
 
@@ -53,24 +51,21 @@ INSERT INTO `categories` (`id`, `title`) VALUES
 DROP TABLE IF EXISTS `customers`;
 CREATE TABLE IF NOT EXISTS `customers` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
-  `firstName` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
-  `lastName` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
-  `phone` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
-  `address` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+  `code` varchar(255) NOT NULL,
+  `firstName` varchar(255) NOT NULL,
+  `lastName` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `customers`
 --
 
 INSERT INTO `customers` (`id`, `code`, `firstName`, `lastName`, `phone`, `address`, `email`) VALUES
-(11, 'JF53974', 'Ahmed', 'NFAIHI', '0643573987', 'TanTan', 'anfaihi10@gmail.com'),
-(12, 'E453295', 'Mohamed', 'BOUKHLIF', '0649056631', 'Marrakech', 'mohamed.boukhlif@gmail.com'),
-(13, 'JF53998', 'Youness', 'IBENCHEROUTEN', '0655648099', 'TanTan', 'y.bench@gmail.com'),
-(14, 'N117951', 'Afraa', 'FAIK', '0645631105', 'Essaouira', 'afraa.faik@gmail.com');
+(2, 'EE77777', 'Mohamed', 'BOUKHLIF', '06666666', '28 DB Lamhrami SYBA Marrakech', 'boukhlifmohamed13@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -86,22 +81,17 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `created_at` timestamp NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_orders_customers` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `orders`
 --
 
 INSERT INTO `orders` (`id`, `customer_id`, `total`, `created_at`) VALUES
-(6, 14, 31610.00, '2018-11-25 00:00:00'),
-(7, 13, 499.00, '2018-11-26 00:00:00'),
-(8, 14, 66400.00, '2018-11-26 00:00:00'),
-(9, 14, 8455.00, '2018-11-26 00:00:00'),
-(10, 11, 2022.00, '2018-11-26 00:00:00'),
-(11, 11, 400.00, '2018-11-26 00:00:00'),
-(12, 12, 1000.00, '2018-11-26 10:53:20'),
-(13, 11, 2775.00, '2018-11-28 00:13:02'),
-(14, 11, 2775.00, '2018-11-28 00:15:37');
+(1, 2, 800.00, '2018-12-05 14:28:22'),
+(2, 2, 1200.00, '2018-12-05 15:11:33'),
+(3, 2, 400.00, '2018-12-16 21:51:51'),
+(4, 2, 400.00, '2018-12-21 09:50:33');
 
 -- --------------------------------------------------------
 
@@ -119,26 +109,47 @@ CREATE TABLE IF NOT EXISTS `order_lines` (
   PRIMARY KEY (`id`),
   KEY `fk_order_lines_products` (`product_id`),
   KEY `fk_order_lines_orders` (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `order_lines`
 --
 
 INSERT INTO `order_lines` (`id`, `product_id`, `order_id`, `qty`, `price`) VALUES
-(5, 5, 6, 5, 5656.00),
-(6, 6, 6, 6, 555.00),
-(7, 1, 7, 1, 400.00),
-(8, 2, 7, 9, 11.00),
-(9, 1, 8, 166, 400.00),
-(10, 1, 9, 21, 400.00),
-(11, 2, 9, 5, 11.00),
-(12, 1, 10, 5, 400.00),
-(13, 2, 10, 2, 11.00),
-(14, 1, 11, 1, 400.00),
-(15, 4, 12, 1, 1000.00),
-(16, 11, 13, 5, 555.00),
-(17, 11, 14, 5, 555.00);
+(1, 2, 1, 2, 400.00),
+(2, 2, 2, 2, 400.00),
+(3, 3, 2, 1, 400.00),
+(4, 2, 3, 1, 400.00),
+(5, 3, 4, 1, 400.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payments`
+--
+
+DROP TABLE IF EXISTS `payments`;
+CREATE TABLE IF NOT EXISTS `payments` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `order_id` bigint(20) NOT NULL,
+  `amount` double(8,2) NOT NULL,
+  `created_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_payments_orders` (`order_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`id`, `order_id`, `amount`, `created_at`) VALUES
+(1, 3, 300.00, '2018-12-16 21:51:52'),
+(2, 3, 50.00, '2018-12-18 20:29:54'),
+(3, 3, 10.00, '2018-12-18 21:38:49'),
+(4, 3, 30.00, '2018-12-18 21:38:49'),
+(5, 3, 3.00, '2018-12-18 21:38:49'),
+(6, 3, 7.00, '2018-12-18 21:38:49'),
+(7, 2, 200.00, '2018-12-18 21:55:21');
 
 -- --------------------------------------------------------
 
@@ -157,24 +168,15 @@ CREATE TABLE IF NOT EXISTS `products` (
   `image` varchar(255) NOT NULL,
   PRIMARY KEY (`code`),
   KEY `fk_products_categories` (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `products`
 --
 
 INSERT INTO `products` (`code`, `category_id`, `label`, `qty`, `buyingPrice`, `sellingPrice`, `image`) VALUES
-(1, 1, 'TV', 2, 200.00, 400.00, 'admin.jpg'),
-(2, 1, 'azerty', 0, 10.00, 11.00, 'resources//images//products//1542759185347.png'),
-(3, 1, 'test', 0, 200.00, 400.00, 'resources//images//products//1542759382309_icons8-add-image-64.png.png'),
-(4, 1, 'teee', 0, 500.00, 1000.00, 'resources//images//products//1542759532449_weBTS.png.png'),
-(5, 1, 'test', 0, 56.00, 5656.00, 'resources//images//products//1542759610860_weBTS.png'),
-(6, 1, 'tttt', 0, 50.00, 555.00, 'resources//images//products//1542760934437_Capture.JPG'),
-(7, 1, '56', 0, 56.00, 56.00, 'resources//images//products//1542761435229_weBTS.png'),
-(8, 1, '4554', 0, 4545.00, 445.00, 'resources/images/products/1542761550413_weBTS.png'),
-(9, 1, '56', 0, 56.00, 56.00, 'resources/images/products/1542761733267_Capture.JPG'),
-(10, 5, 'Produit1', 0, 500.00, 1000.00, 'C:\\eclipse-workspace\\TPsMrNaji\\clothes_shop\\resources\\images\\products\\1543109143270_44917868_557893624664857_4929024805283299328_n.jpg'),
-(11, 1, 'test', 2, 55.00, 555.00, 'C:\\eclipse-workspace\\TPsMrNaji\\clothes_shop\\resources\\images\\products\\1543355301543_44917868_557893624664857_4929024805283299328_n.jpg');
+(2, 2, 'Jacket 1', 5, 300.00, 400.00, 'resources/images/products/1544019511080_5bb36112554c7f08176ec0e9.png'),
+(3, 2, 'Jacket 2', 8, 300.00, 400.00, 'resources/images/products/1544022065674_5bb360f7554c7f08176ec0e5.png');
 
 --
 -- Constraints for dumped tables
@@ -192,6 +194,12 @@ ALTER TABLE `orders`
 ALTER TABLE `order_lines`
   ADD CONSTRAINT `fk_order_lines_orders` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_order_lines_products` FOREIGN KEY (`product_id`) REFERENCES `products` (`code`);
+
+--
+-- Constraints for table `payments`
+--
+ALTER TABLE `payments`
+  ADD CONSTRAINT `fk_payments_orders` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `products`
