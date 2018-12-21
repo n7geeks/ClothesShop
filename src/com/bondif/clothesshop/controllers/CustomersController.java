@@ -215,7 +215,7 @@ public class CustomersController {
 
         validate.setOnAction(event -> {
             String errorMsg = "";
-            boolean isValidInput = false;
+            boolean isValidInput = true;
 
             String code = codeTf.getText().trim();
             if(code.isEmpty()){

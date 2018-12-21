@@ -127,6 +127,7 @@ public class OrdersController {
         searchSection.setPadding(new Insets(15));
         searchSection.setMaxWidth(200);
 
+
         container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
 
         return container;
@@ -206,10 +207,10 @@ public class OrdersController {
         addProductCol.setCellFactory(ActionButtonTableCell.forTableColumn("Ajouter", (Product p) -> {
             int qty = GUITools.openQtyTextInputDialog();
             if (qty == -1) return p;
-            if (qty > 0 && p.getQty() >= qty && OrderLinesController.canAddQty(p, qty))
+            //if (qty > 0 && p.getQty() >= qty && OrderLinesController.canAddQty(p, qty))
                 OrderLinesController.add(new OrderLine(0, p, p.getSellingPrice(), qty));
-            else
-                GUITools.openDialogOk(null, null, "La quantité choisie est plus grande que celle en stock !!", Alert.AlertType.ERROR);
+            //else
+                //GUITools.openDialogOk(null, null, "La quantité choisie est plus grande que celle en stock !!", Alert.AlertType.ERROR);
             return p;
         }));
 
@@ -267,7 +268,7 @@ public class OrdersController {
         //searchTf.setMinWidth(300);
         searchTf.getStyleClass().add("searchBar");
         searchTf.setMinWidth(200);
-        searchTf.setMinHeight(28);
+        searchTf.setMinHeight(35);
         searchTf.setAlignment(Pos.CENTER);
         searchTf.getStyleClass().remove("text-field");
 
