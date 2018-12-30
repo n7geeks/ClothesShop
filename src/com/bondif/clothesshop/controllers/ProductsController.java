@@ -14,9 +14,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import java.io.File;
@@ -63,6 +68,12 @@ public class ProductsController {
         Button categoryBtn = GUITools.getButton(GUITools.getImage(categoriesIconPath), "Catégories", 100);
         categoryBtn.setOnAction(event -> {
             AppController.showCategoryForm();
+        });
+
+        Button btn = new Button("Show products");
+        btn.setOnAction(event -> {
+            productsOl = getProductsOl();
+            AppController.getRoot().setCenter(showProducts(productsOl));
         });
 
         // Products Table
@@ -125,9 +136,8 @@ public class ProductsController {
         /*searchContainer.getChildren().add(searchTf);
         searchContainer.setAlignment(Pos.CENTER_RIGHT);*/
 
-
         //hBox config
-        hBox.getChildren().addAll(addBtn, categoryBtn, region, searchTf);
+        hBox.getChildren().addAll(btn, addBtn, categoryBtn, region, searchTf);
 
         vBox.getChildren().addAll(hBox, productsTableView);
 
@@ -154,7 +164,7 @@ public class ProductsController {
 
         Label codeLabel = new Label("Code");
         Label labelLabel = new Label("Désignation");
-        Label qtyLabel = new Label("Quantité");
+        /*Label qtyLabel = new Label("Quantité");*/
         Label buyPriceLabel = new Label("Prix d'achat");
         Label sellPriceLabel = new Label("Prix de vente");
         Label categoryLabel = new Label("Catégorie");
@@ -164,8 +174,8 @@ public class ProductsController {
         codeTf.setPromptText("Code");
         TextField labelTf = new TextField();
         labelTf.setPromptText("Désignation");
-        TextField qtyTf = new TextField();
-        qtyTf.setPromptText("Quantité");
+        /*TextField qtyTf = new TextField();
+        qtyTf.setPromptText("Quantité");*/
         TextField buyPriceTf = new TextField();
         buyPriceTf.setPromptText("Prix d'achat");
         TextField sellPriceTf = new TextField();
@@ -189,7 +199,7 @@ public class ProductsController {
                 isValidInput = false;
             }
 
-            try {
+            /*try {
                 qty = Integer.parseInt(qtyTf.getText());
                 if (qty <= 0) {
                     errorMsg += "- La qunatité doit être supérieure à 0\r\n";
@@ -198,7 +208,8 @@ public class ProductsController {
             } catch (NumberFormatException ex) {
                 errorMsg += "- la quantité doit être un entier\r\n";
                 isValidInput = false;
-            }
+            }*/
+
             try {
                 buyingPrice = Double.parseDouble(buyPriceTf.getText());
                 if (buyingPrice <= 0) {
@@ -238,17 +249,17 @@ public class ProductsController {
 
         gridPane.add(codeLabel, 0, 1);
         gridPane.add(labelLabel, 0, 2);
-        gridPane.add(qtyLabel, 0, 3);
-        gridPane.add(buyPriceLabel, 0, 4);
-        gridPane.add(sellPriceLabel, 0, 5);
-        gridPane.add(categoryLabel, 0, 6);
+        /*gridPane.add(qtyLabel, 0, 3);*/
+        gridPane.add(buyPriceLabel, 0, 3);
+        gridPane.add(sellPriceLabel, 0, 4);
+        gridPane.add(categoryLabel, 0, 5);
 
         gridPane.add(codeTf, 1, 1);
         gridPane.add(labelTf, 1, 2);
-        gridPane.add(qtyTf, 1, 3);
-        gridPane.add(buyPriceTf, 1, 4);
-        gridPane.add(sellPriceTf, 1, 5);
-        gridPane.add(categoriesCb, 1, 6);
+        //gridPane.add(qtyTf, 1, 3);
+        gridPane.add(buyPriceTf, 1, 3);
+        gridPane.add(sellPriceTf, 1, 4);
+        gridPane.add(categoriesCb, 1, 5);
 
         gridPane.add(submitBtn, 0, 6, 2, 1);
 
@@ -265,6 +276,7 @@ public class ProductsController {
         gridPane.setHgap(10);
         gridPane.setVgap(10);
 
+        gridPane.getChildren().get(6).getStyleClass().remove("text-field");
         return gridPane;
     }
 
@@ -299,12 +311,12 @@ public class ProductsController {
         // code column
         TableColumn<Product, Long> codeColumn = new TableColumn<>("Code");
         codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
-        codeColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 5));
+        codeColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 5)); // 5 --> 8
 
         // label column
         TableColumn<Product, String> labelColumn = new TableColumn<>("Désignation");
         labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
-        labelColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 15));
+        labelColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 15)); // 15 --> 18
 
         // qty column
         TableColumn<Product, Integer> qtyColumn = new TableColumn<>("Quantité");
@@ -314,7 +326,7 @@ public class ProductsController {
         // buyPrice column
         TableColumn<Product, Double> buyPriceColumn = new TableColumn<>("Prix d'achat");
         buyPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
-        buyPriceColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 10));
+        buyPriceColumn.prefWidthProperty().bind(productsTableView.widthProperty().divide(100 / 10)); // 10 --> 20
 
         // sellPrice column
         TableColumn<Product, Double> sellPriceColumn = new TableColumn<>("Prix de vente");
@@ -341,26 +353,26 @@ public class ProductsController {
         ImageView imageView = (ImageView) gridPane.getChildren().get(0);
         imageView.setImage(GUITools.getImage(product.getImage()));
 
-        TextField codeTf = (TextField) gridPane.getChildren().get(7);
+        TextField codeTf = (TextField) gridPane.getChildren().get(6);
         codeTf.setText(product.getCode().toString());
         codeTf.setDisable(true);
 
-        TextField labelTf = (TextField) gridPane.getChildren().get(8);
+        TextField labelTf = (TextField) gridPane.getChildren().get(7);
         labelTf.setText(product.getLabel());
 
-        TextField qtyTf = (TextField) gridPane.getChildren().get(9);
-        qtyTf.setText(product.getQty() + "");
+        /*TextField qtyTf = (TextField) gridPane.getChildren().get(9);
+        qtyTf.setText(product.getQty() + "");*/
 
-        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(10);
+        TextField buyingPriceTf = (TextField) gridPane.getChildren().get(8);
         buyingPriceTf.setText(product.getBuyingPrice() + "");
 
-        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(11);
+        TextField sellingPriceTf = (TextField) gridPane.getChildren().get(9);
         sellingPriceTf.setText(product.getSellingPrice() + "");
 
-        ComboBox<Category> categoriesCb = (ComboBox<Category>) gridPane.getChildren().get(12);
+        ComboBox<Category> categoriesCb = (ComboBox<Category>) gridPane.getChildren().get(10);
         categoriesCb.setValue(product.getCategory());
 
-        Button updateButton = (Button) gridPane.getChildren().get(13);
+        Button updateButton = (Button) gridPane.getChildren().get(11);
         updateButton.setText("Modifier");
 
         updateButton.setOnAction(e -> {
@@ -382,7 +394,7 @@ public class ProductsController {
                 isValidInput = false;
             }
 
-            try {
+            /*try {
                 qty = Integer.parseInt(qtyTf.getText());
                 if (qty <= 0) {
                     errorMsg += "- La qunatité doit être superieure à 0\r\n";
@@ -391,7 +403,8 @@ public class ProductsController {
             } catch (NumberFormatException ex) {
                 errorMsg += "- La qunatité doit être un entier\r\n";
                 isValidInput = false;
-            }
+            }*/
+
             try {
                 buyingPrice = Double.parseDouble(buyingPriceTf.getText());
                 if (buyingPrice <= 0) {
@@ -483,5 +496,45 @@ public class ProductsController {
         return gridPane;
     }
 
+    public static VBox showProducts(ObservableList<Product> products){
+        VBox vBox = new VBox();
 
+        Circle roundedImages[] = new Circle[products.size()];
+        Rectangle rectangles[] = new Rectangle[products.size()];
+        Image productImages[] = new Image[products.size()];
+        Label designation[] = new Label[products.size()];
+        Label quantity[] = new Label[products.size()];
+        Label buyingPrice[] = new Label[products.size()];
+        Label sellingPrice[] = new Label[products.size()];
+        Label category[] = new Label[products.size()];
+        HBox hBoxes[] = new HBox[products.size()];
+
+        for (int i = 0; i < products.size();i++){
+            productImages[i] = GUITools.getImage(products.get(i).getImage());
+            roundedImages[i] = new Circle(50);
+            roundedImages[i].getStyleClass().add("image");
+            roundedImages[i].setFill(new ImagePattern(productImages[i]));
+            designation[i] = new Label();
+            designation[i].setText(products.get(i).getLabel());
+            quantity[i] = new Label();
+            quantity[i].setText(products.get(i).getQty() + "");
+            buyingPrice[i] = new Label();
+            buyingPrice[i].setText(products.get(i).getBuyingPrice() + "");
+            sellingPrice[i] = new Label();
+            sellingPrice[i].setText(products.get(i).getSellingPrice() + "");
+            category[i] = new Label();
+            category[i].setText(products.get(i).getCategory().getTitle());
+            hBoxes[i] = new HBox();
+            hBoxes[i].setSpacing(30);
+            hBoxes[i].getChildren().addAll(roundedImages[i], designation[i], quantity[i], buyingPrice[i], sellingPrice[i], category[i]);
+            hBoxes[i].setAlignment(Pos.CENTER);
+            vBox.getChildren().add(hBoxes[i]);
+        }
+
+        vBox.setSpacing(30);
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setPadding(new Insets(15));
+
+        return vBox;
+    }
 }

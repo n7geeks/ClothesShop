@@ -1,6 +1,8 @@
 package com.bondif.clothesshop.views;
 
+import com.bondif.clothesshop.controllers.AdminController;
 import com.bondif.clothesshop.controllers.AppController;
+import com.bondif.clothesshop.models.Admin;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -26,7 +28,7 @@ public class GUIGenerator {
         sideBar.setBackground(new Background(new BackgroundFill(Paint.valueOf("#eee"), null, null)));
         //sideBar.setSpacing(15);
 
-        VBox adminPart = new VBox();
+        VBox adminPart = AdminController.getAdminPanel();
         // insert admin image
         ImageView avatar = new ImageView();
 
@@ -34,34 +36,38 @@ public class GUIGenerator {
         avatar.setFitWidth(100.0);
         avatar.setPreserveRatio(true);
 
-        adminPart.getChildren().add(avatar);
+        /*adminPart.getChildren().add(avatar);
         adminPart.setPadding(new Insets(10, 10, 40, 10));
-        adminPart.setStyle("-fx-alignment: center");
+        adminPart.setStyle("-fx-alignment: center");*/
 
         Text adminName = new Text("Admin");
 
-        adminPart.getChildren().add(adminName);
+        //adminPart.getChildren().add(adminName);
 
         Button dashboardBtn = getSideBarButton(GUITools.getImage("resources/icons/home-page-56.png"), "Tableau de bord", sideBar.getMinWidth());
         Button productsBtn = getSideBarButton(GUITools.getImage("resources/icons/product-56.png"), "Produits", sideBar.getMinWidth());
         Button clientsBtn = getSideBarButton(GUITools.getImage("resources/icons/client-management-56.png"), "Clients", sideBar.getMinWidth());
         Button sellsBtn = getSideBarButton(GUITools.getImage("resources/icons/sell-56.png"), "Ventes", sideBar.getMinWidth());
+        Button logOutBtn = getSideBarButton(GUITools.getImage("resources/icons/log-out-56.png"), "Se déconnecter", sideBar.getMinWidth());
 
         dashboardBtn.getStyleClass().addAll("leftSideButton", "setFont");
         productsBtn.getStyleClass().addAll("leftSideButton", "setFont");
         clientsBtn.getStyleClass().addAll("leftSideButton", "setFont");
         sellsBtn.getStyleClass().addAll("leftSideButton", "setFont");
+        logOutBtn.getStyleClass().addAll("leftSideButton", "setFont");
         dashboardBtn.getStyleClass().remove("button");
         productsBtn.getStyleClass().remove("button");
         clientsBtn.getStyleClass().remove("button");
         sellsBtn.getStyleClass().remove("button");
+        logOutBtn.getStyleClass().remove("button");
 
         dashboardBtn.setOnAction(event ->  {
             AppController.showDashboard();
+
         });
 
         //dashboardBtn.setStyle("-fx-background-color: white; -fx-border-color: #F5DA17; -fx-border-width: 2px; -fx-border-style: solid; -fx-text-fill: black;");
-        productsBtn.setOnAction(event ->  {
+        productsBtn.setOnAction(event -> {
             AppController.showProducts();
         });
 
@@ -73,8 +79,15 @@ public class GUIGenerator {
             AppController.showSales();
         });
 
+        logOutBtn.setOnAction(event -> {
+            AppController.getStage().setWidth(450);
+            AppController.getStage().setHeight(620);
+            AppController.getScene().setRoot(AdminController.getLoginInterface());
+            AppController.getStage().centerOnScreen();
+        });
+
         sideBar.getChildren().add(adminPart);
-        sideBar.getChildren().addAll(dashboardBtn, productsBtn, clientsBtn, sellsBtn);
+        sideBar.getChildren().addAll(dashboardBtn, productsBtn, clientsBtn, sellsBtn, logOutBtn);
 
         return sideBar;
     }

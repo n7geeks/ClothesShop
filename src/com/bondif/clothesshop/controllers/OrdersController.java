@@ -123,6 +123,8 @@ public class OrdersController {
         searchSection.setPadding(new Insets(15));
         searchSection.setMaxWidth(200);
 
+        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
+        //HBox orderLinesAndPayments = new HBox(orderLinesSection, paymentsSection);
         GridPane orderLinesAndPayments = new GridPane();
         orderLinesAndPayments.add(orderLinesSection, 0, 0);
         orderLinesAndPayments.add(paymentsSection, 0, 1);
@@ -224,7 +226,6 @@ public class OrdersController {
             if (qty == -1) return p;
 
             OrderLinesController.add(new OrderLine(0, p, p.getSellingPrice(), qty));
-
             return p;
         }));
 
@@ -298,7 +299,7 @@ public class OrdersController {
         //searchTf.setMinWidth(300);
         searchTf.getStyleClass().add("searchBar");
         searchTf.setMinWidth(200);
-        searchTf.setMinHeight(28);
+        searchTf.setMinHeight(35);
         searchTf.setAlignment(Pos.CENTER);
         searchTf.getStyleClass().remove("text-field");
 
