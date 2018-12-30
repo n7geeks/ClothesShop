@@ -191,7 +191,7 @@ public class OrdersController {
 
     private static Pane getOrderLinesSection() {
         TableView<OrderLine> orderLinesTv = OrderLinesController.getSaleOrderLinesTv(true);
-        orderLinesTv.setMaxHeight(500);
+        orderLinesTv.setMaxHeight(400);
         orderLinesTv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         return new VBox(orderLinesTv);
@@ -222,10 +222,9 @@ public class OrdersController {
         addProductCol.setCellFactory(ActionButtonTableCell.forTableColumn("Ajouter", (Product p) -> {
             int qty = GUITools.openQtyTextInputDialog();
             if (qty == -1) return p;
-            if (qty > 0 && p.getQty() >= qty && OrderLinesController.canAddQty(p, qty))
-                OrderLinesController.add(new OrderLine(0, p, p.getSellingPrice(), qty));
-            else
-                GUITools.openDialogOk(null, null, "La quantité choisie est plus grande que celle en stock !!", Alert.AlertType.ERROR);
+
+            OrderLinesController.add(new OrderLine(0, p, p.getSellingPrice(), qty));
+
             return p;
         }));
 
@@ -241,7 +240,6 @@ public class OrdersController {
         Button submitBtn = GUITools.getButton(GUITools.getImage(submitIconPath), "Passer la commande", 70);
 
         submitBtn.setOnAction(event -> {
-
             boolean isValidInput = true;
             String errorMsg = "";
             double total = 0;
@@ -272,9 +270,16 @@ public class OrdersController {
                     (new ProductDaoImpl()).updateQty(orderLine.getProduct());
 
                 }
-                orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl(), PaymentsController.getPaymentsOl()));
+                Collection<Payment> payments = PaymentsController.getPaymentsOl();
+                if(PaymentsController.getPaymentMethodsCb().getValue().equals(PaymentMethod.CASH)) {
+                    payments.add(new Payment(0, total, LocalDateTime.now(), null));
+                }
+                orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl(), payments));
                 OrderLinesController.getOrderLinesOl().clear();
                 PaymentsController.getPaymentsOl().clear();
+                PaymentsController.getPaymentMethodsCb().setValue(PaymentMethod.CASH);
+                PaymentsController.getAmountTf().setText("");
+                PaymentsController.getTotalVal().setText("0.0 Dhs");
                 AppController.showSales();
             } else {
                 GUITools.openDialogOk(null, null, errorMsg, Alert.AlertType.WARNING);

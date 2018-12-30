@@ -1,7 +1,7 @@
 package com.bondif.clothesshop.controllers;
 
 import com.bondif.clothesshop.core.PaymentDaoImpl;
-import com.bondif.clothesshop.models.Order;
+import com.bondif.clothesshop.core.PaymentMethod;
 import com.bondif.clothesshop.models.Payment;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.GUITools;
@@ -23,6 +23,8 @@ public class PaymentsController {
     private static TextField amountTf;
     private static Button addPaymentBtn;
     private static PaymentDaoImpl paymentDao;
+    private static ComboBox<PaymentMethod> paymentMethodsCb;
+    private static HBox paymentAdvanceHb;
 
     static {
         paymentDao = new PaymentDaoImpl();
@@ -31,6 +33,8 @@ public class PaymentsController {
         totalVal = new Label(calculatedTotal + " Dhs");
         amountTf = new TextField();
         addPaymentBtn = new Button("Ajouter");
+        paymentMethodsCb = new ComboBox<>();
+        paymentAdvanceHb = new HBox();
     }
 
     public static void addPayments(Collection<Payment> payments) {
@@ -59,12 +63,16 @@ public class PaymentsController {
         Label total = new Label("Total : ");
         Label state = new Label("Etat : ");
         Label stateVal = new Label("En cours");
-        Label amount = new Label("Montant");
-        amountTf.setDisable(true);
+        Label advance = new Label("Avance ");
+        amountTf.setDisable(false);
         addPaymentBtn.setDisable(true);
 
+        Label choosePaymentMethod = new Label("Methode de paiement : ");
+        paymentMethodsCb.getItems().setAll(PaymentMethod.values());
+        paymentMethodsCb.setValue(PaymentMethod.CASH);
+
         addPaymentBtn.setOnAction(e -> {
-            double parsedAmount;
+            double parsedAmount = 0;
             try {
                 parsedAmount = Double.parseDouble(amountTf.getText());
             } catch (NumberFormatException e1) {
@@ -72,13 +80,22 @@ public class PaymentsController {
                 GUITools.openDialogOk("Erreur", null, "Veuillez enterer un numéro dans le champ du montant", Alert.AlertType.ERROR);
                 return;
             }
-            if(parsedAmount > calculatedTotal) {
+            if (parsedAmount > calculatedTotal) {
                 GUITools.openDialogOk("Erreur", null, "Impossible de payer un montant plus grand que le total", Alert.AlertType.WARNING);
                 return;
             }
             amountTf.clear();
             Payment payment = new Payment(0, parsedAmount, LocalDateTime.now(), null);
             getPaymentsOl().add(payment);
+        });
+        paymentAdvanceHb = new HBox(advance, amountTf);
+
+        paymentMethodsCb.setOnAction(e -> {
+            if (paymentMethodsCb.getValue() != null && paymentMethodsCb.getValue().equals(PaymentMethod.DRAFTS)) {
+                vBox.getChildren().add(paymentAdvanceHb);
+            } else {
+                vBox.getChildren().remove(paymentAdvanceHb);
+            }
         });
 
         TableView<Payment> paymentsTv = getBasicTv();
@@ -95,7 +112,7 @@ public class PaymentsController {
         paymentsTv.setItems(paymentsOl);
         paymentsTv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        vBox.getChildren().addAll(new HBox(total, totalVal), new HBox(state, stateVal), new HBox(amount, amountTf, addPaymentBtn), paymentsTv);
+        vBox.getChildren().addAll(new HBox(total, totalVal), new HBox(state, stateVal), new HBox(choosePaymentMethod, paymentMethodsCb));
 
         return vBox;
     }
@@ -133,12 +150,24 @@ public class PaymentsController {
     }
 
     private static void setDisableAmountTf() {
-        if(calculatedTotal == 0.0) amountTf.setDisable(true);
+        if (calculatedTotal == 0.0) amountTf.setDisable(true);
         else amountTf.setDisable(false);
     }
 
     private static void setDisableAddPaymentBtn() {
-        if(calculatedTotal == 0.0) addPaymentBtn.setDisable(true);
+        if (calculatedTotal == 0.0) addPaymentBtn.setDisable(true);
         else addPaymentBtn.setDisable(false);
+    }
+
+    public static ComboBox<PaymentMethod> getPaymentMethodsCb() {
+        return paymentMethodsCb;
+    }
+
+    public static TextField getAmountTf() {
+        return amountTf;
+    }
+
+    public static Label getTotalVal() {
+        return totalVal;
     }
 }
