@@ -70,11 +70,11 @@ public class ProductsController {
             AppController.showCategoryForm();
         });
 
-        Button btn = new Button("Show products");
+        /*Button btn = new Button("Show products");
         btn.setOnAction(event -> {
             productsOl = getProductsOl();
             AppController.getRoot().setCenter(showProducts(productsOl));
-        });
+        });*/
 
         // Products Table
         TableView<Product> productsTableView = getBasicTableView();
@@ -137,7 +137,7 @@ public class ProductsController {
         searchContainer.setAlignment(Pos.CENTER_RIGHT);*/
 
         //hBox config
-        hBox.getChildren().addAll(btn, addBtn, categoryBtn, region, searchTf);
+        hBox.getChildren().addAll(addBtn, categoryBtn, region, searchTf);
 
         vBox.getChildren().addAll(hBox, productsTableView);
 
@@ -496,8 +496,8 @@ public class ProductsController {
         return gridPane;
     }
 
-    public static VBox showProducts(ObservableList<Product> products){
-        VBox vBox = new VBox();
+    public static GridPane showProducts(ObservableList<Product> products){
+        GridPane productsGrid = new GridPane();
 
         Circle roundedImages[] = new Circle[products.size()];
         Rectangle rectangles[] = new Rectangle[products.size()];
@@ -508,6 +508,7 @@ public class ProductsController {
         Label sellingPrice[] = new Label[products.size()];
         Label category[] = new Label[products.size()];
         HBox hBoxes[] = new HBox[products.size()];
+        int columnIndex = 0, rowIndex = 0;
 
         for (int i = 0; i < products.size();i++){
             productImages[i] = GUITools.getImage(products.get(i).getImage());
@@ -525,16 +526,21 @@ public class ProductsController {
             category[i] = new Label();
             category[i].setText(products.get(i).getCategory().getTitle());
             hBoxes[i] = new HBox();
-            hBoxes[i].setSpacing(30);
+            hBoxes[i].setSpacing(15);
             hBoxes[i].getChildren().addAll(roundedImages[i], designation[i], quantity[i], buyingPrice[i], sellingPrice[i], category[i]);
-            hBoxes[i].setAlignment(Pos.CENTER);
-            vBox.getChildren().add(hBoxes[i]);
+            productsGrid.add(hBoxes[i], columnIndex, rowIndex);
+            columnIndex++;
+            hBoxes[i].setAlignment(Pos.CENTER_LEFT);
+            if (columnIndex == 2){
+                rowIndex++;
+                columnIndex = 0;
+                hBoxes[i].setAlignment(Pos.CENTER_RIGHT);
+            }
         }
 
-        vBox.setSpacing(30);
-        vBox.setAlignment(Pos.CENTER);
-        vBox.setPadding(new Insets(15));
+        productsGrid.setAlignment(Pos.CENTER_LEFT);
+        productsGrid.setPadding(new Insets(15));
 
-        return vBox;
+        return productsGrid;
     }
 }
