@@ -1,6 +1,8 @@
 package com.bondif.clothesshop.models;
 
-public class Customer {
+import java.io.Serializable;
+
+public class Customer implements Serializable {
     private Long id;
     private String code;
     private String firstName;

@@ -4,6 +4,7 @@ import com.bondif.clothesshop.core.PaymentDaoImpl;
 import com.bondif.clothesshop.core.PaymentMethod;
 import com.bondif.clothesshop.models.Payment;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
+import com.bondif.clothesshop.views.CardPaymentView;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,6 +26,7 @@ public class PaymentsController {
     private static PaymentDaoImpl paymentDao;
     private static ComboBox<PaymentMethod> paymentMethodsCb;
     private static HBox paymentAdvanceHb;
+    private static CardPaymentView cardPaymentView;
 
     static {
         paymentDao = new PaymentDaoImpl();
@@ -35,6 +37,7 @@ public class PaymentsController {
         addPaymentBtn = new Button("Ajouter");
         paymentMethodsCb = new ComboBox<>();
         paymentAdvanceHb = new HBox();
+        cardPaymentView = new CardPaymentView();
     }
 
     public static void addPayments(Collection<Payment> payments) {
@@ -64,6 +67,7 @@ public class PaymentsController {
         Label state = new Label("Etat : ");
         Label stateVal = new Label("En cours");
         Label advance = new Label("Avance ");
+        VBox cardPaymentBox = (VBox)cardPaymentView.render();
         amountTf.setDisable(false);
         addPaymentBtn.setDisable(true);
 
@@ -85,7 +89,7 @@ public class PaymentsController {
                 return;
             }
             amountTf.clear();
-            Payment payment = new Payment(0, parsedAmount, LocalDateTime.now(), null);
+            Payment payment = new Payment(0, parsedAmount, PaymentMethod.DRAFTS, LocalDateTime.now(), null);
             getPaymentsOl().add(payment);
         });
         paymentAdvanceHb = new HBox(advance, amountTf);
@@ -95,6 +99,11 @@ public class PaymentsController {
                 vBox.getChildren().add(paymentAdvanceHb);
             } else {
                 vBox.getChildren().remove(paymentAdvanceHb);
+            }
+            if (paymentMethodsCb.getValue() != null && paymentMethodsCb.getValue().equals(PaymentMethod.ONLINE)) {
+                vBox.getChildren().add(cardPaymentBox);
+            } else {
+                vBox.getChildren().remove(cardPaymentBox);
             }
         });
 
@@ -169,5 +178,9 @@ public class PaymentsController {
 
     public static Label getTotalVal() {
         return totalVal;
+    }
+
+    public static CardPaymentView getCardPaymentView() {
+        return cardPaymentView;
     }
 }

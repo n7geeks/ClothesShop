@@ -1,18 +1,26 @@
 package com.bondif.clothesshop.models;
 
-public class Account {
-    private final int RIB;
-    private double amount;
-    private Customer customer;
+import java.io.Serializable;
 
-    public Account(int RIB, double amount, Customer customer) {
-        this.RIB = RIB;
-        this.amount = amount;
+public class Account implements Serializable {
+    private int id;
+    private Card card;
+    private Customer customer;
+    private double amount;
+
+    public Account(int id, Card card, Customer customer, double amount) {
+        this.id = id;
+        this.card = card;
         this.customer = customer;
+        this.amount = amount;
     }
 
-    public int getRIB() {
-        return RIB;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public double getAmount() {
@@ -21,6 +29,14 @@ public class Account {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
     }
 
     public Customer getCustomer() {

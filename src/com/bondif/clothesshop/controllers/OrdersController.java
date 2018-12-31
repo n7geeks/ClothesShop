@@ -3,6 +3,7 @@ package com.bondif.clothesshop.controllers;
 import com.bondif.clothesshop.core.*;
 import com.bondif.clothesshop.models.*;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
+import com.bondif.clothesshop.views.CardPaymentView;
 import com.bondif.clothesshop.views.GUITools;
 import com.bondif.clothesshop.views.utils.ComboBoxAutoComplete;
 import com.bondif.clothesshop.views.utils.Toast;
@@ -123,7 +124,7 @@ public class OrdersController {
         searchSection.setPadding(new Insets(15));
         searchSection.setMaxWidth(200);
 
-        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
+//        container.getChildren().addAll(clientsHbox, searchSection, productsSection, orderLinesSection, submitHbox);
         //HBox orderLinesAndPayments = new HBox(orderLinesSection, paymentsSection);
         GridPane orderLinesAndPayments = new GridPane();
         orderLinesAndPayments.add(orderLinesSection, 0, 0);
@@ -273,7 +274,35 @@ public class OrdersController {
                 }
                 Collection<Payment> payments = PaymentsController.getPaymentsOl();
                 if(PaymentsController.getPaymentMethodsCb().getValue().equals(PaymentMethod.CASH)) {
-                    payments.add(new Payment(0, total, LocalDateTime.now(), null));
+                    payments.add(new Payment(0, total, PaymentMethod.CASH, LocalDateTime.now(), null));
+                } else if(PaymentsController.getPaymentMethodsCb().getValue().equals(PaymentMethod.ONLINE)) {
+                    // create Account instance
+                    CardPaymentView cpV = PaymentsController.getCardPaymentView();
+                    Card card = new Card(cpV.getCardTypesCb().getValue(),
+                            Integer.parseInt(cpV.getCardNumberField().getText()),
+                            Integer.parseInt(cpV.getExpMonthCb().getValue().toString()),
+                            Integer.parseInt(cpV.getExpYearCb().getValue().toString()),
+                            Integer.parseInt(cpV.getVerificationCardField().getText()));
+                    Account account = new Account(0, card, customersCb.getValue(), total);
+                    // send instance to remote server
+                    BankSocket bankSocket = new BankSocket(account);
+                    // get response
+                    int success = bankSocket.sendPayment();
+                    // persist payment
+                    switch (success) {
+                        case 200:
+                            payments.add(new Payment(0, total, PaymentMethod.ONLINE, LocalDateTime.now(), null));
+                            break;
+                        case 400:
+                            GUITools.openDialogOk("Erreur", null, "Votre carte ne contient le montant demandé", Alert.AlertType.ERROR);
+                            return;
+                        case 404:
+                            GUITools.openDialogOk("Erreur", null, "Les données de la carte ne sont incorrecte", Alert.AlertType.ERROR);
+                            return;
+                        case 500:
+                            GUITools.openDialogOk("Erreur", null, "Une erreur s'est produite, merci de réessayer ultrièrement", Alert.AlertType.ERROR);
+                            return;
+                    }
                 }
                 orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl(), payments));
                 OrderLinesController.getOrderLinesOl().clear();
@@ -349,9 +378,14 @@ public class OrdersController {
         moneyBox.setSpacing(10);
 
         TableView<Payment> paymentsTv = PaymentsController.getBasicTv();
+
+        // Method column
+        TableColumn<Payment, PaymentMethod> methodCol = new TableColumn<>("Méthode");
+        methodCol.setCellValueFactory(new PropertyValueFactory<>("method"));
+        paymentsTv.getColumns().add(methodCol);
+
         paymentsTv.setItems(FXCollections.observableArrayList(payments));
-        paymentsTv.getColumns().get(0).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
-        paymentsTv.getColumns().get(1).prefWidthProperty().bind(paymentsTv.widthProperty().divide(100 / 50));
+        paymentsTv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // add payments
         TextField amountTf = new TextField();
@@ -393,7 +427,7 @@ public class OrdersController {
                         return;
                     }
 
-                    Payment payment = new Payment(0, amount, LocalDateTime.now(), order);
+                    Payment payment = new Payment(0, amount, PaymentMethod.DRAFTS, LocalDateTime.now(), order);
                     newPaymentsTv.getItems().add(payment);
                     saveNewPayments.setDisable(false);
                     rest -= amount;

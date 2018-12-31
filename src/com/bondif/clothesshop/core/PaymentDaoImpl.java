@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -24,7 +23,7 @@ public class PaymentDaoImpl extends AbstractDao implements Dao<Payment> {
 
     public Collection<Payment> findAll(Order order) {
         Collection<Payment> payments = new LinkedList<>();
-        String sql = "select id, amount, created_at from payments where order_id = ?";
+        String sql = "select id, amount, created_at, method from payments where order_id = ?";
 
         PreparedStatement pstmt;
         ResultSet rs;
@@ -38,6 +37,7 @@ public class PaymentDaoImpl extends AbstractDao implements Dao<Payment> {
                 Payment payment = new Payment();
                 payment.setId(rs.getLong("id"));
                 payment.setAmount(rs.getDouble("amount"));
+                payment.setMethod(strToMethod(rs.getString("method")));
                 payment.setCreatedAt(Tools.toLocalDateTime(rs.getTimestamp("created_at")));
                 payments.add(payment);
             }
@@ -58,11 +58,12 @@ public class PaymentDaoImpl extends AbstractDao implements Dao<Payment> {
     public void create(Payment payment) {
         PreparedStatement pstsmt;
 
-        String sql = "INSERT INTO payments VALUES (NULL, ?, ?, now())";
+        String sql = "INSERT INTO payments VALUES (NULL, ?, null, ?, ?, now())";
         try {
             pstsmt = getConnection().prepareStatement(sql);
             pstsmt.setLong(1, payment.getOrder().getId());
             pstsmt.setDouble(2, payment.getAmount());
+            pstsmt.setString(3, payment.getMethod().dbName());
             pstsmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,5 +78,18 @@ public class PaymentDaoImpl extends AbstractDao implements Dao<Payment> {
     @Override
     public void delete(Payment entity) {
 
+    }
+
+    private PaymentMethod strToMethod(String s) {
+        if (s.equals("0")) {
+            return PaymentMethod.CASH;
+        } else if (s.equals("1")) {
+            return PaymentMethod.CHECK;
+        } else if (s.equals("2")) {
+            return PaymentMethod.ONLINE;
+        } else if (s.equals("3")) {
+            return PaymentMethod.DRAFTS;
+        }
+        return null;
     }
 }
