@@ -5,6 +5,7 @@ import com.bondif.clothesshop.core.PaymentMethod;
 import com.bondif.clothesshop.models.Payment;
 import com.bondif.clothesshop.views.ActionButtonTableCell;
 import com.bondif.clothesshop.views.CardPaymentView;
+import com.bondif.clothesshop.views.ChequePaymentView;
 import com.bondif.clothesshop.views.GUITools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,6 +28,7 @@ public class PaymentsController {
     private static ComboBox<PaymentMethod> paymentMethodsCb;
     private static HBox paymentAdvanceHb;
     private static CardPaymentView cardPaymentView;
+    private static ChequePaymentView chequePaymentView;
 
     static {
         paymentDao = new PaymentDaoImpl();
@@ -38,6 +40,7 @@ public class PaymentsController {
         paymentMethodsCb = new ComboBox<>();
         paymentAdvanceHb = new HBox();
         cardPaymentView = new CardPaymentView();
+        chequePaymentView = new ChequePaymentView();
     }
 
     public static void addPayments(Collection<Payment> payments) {
@@ -68,6 +71,7 @@ public class PaymentsController {
         Label stateVal = new Label("En cours");
         Label advance = new Label("Avance ");
         VBox cardPaymentBox = (VBox)cardPaymentView.render();
+        VBox chequePaymentBox = (VBox)chequePaymentView.render();
         amountTf.setDisable(false);
         addPaymentBtn.setDisable(true);
 
@@ -104,6 +108,11 @@ public class PaymentsController {
                 vBox.getChildren().add(cardPaymentBox);
             } else {
                 vBox.getChildren().remove(cardPaymentBox);
+            }
+            if (paymentMethodsCb.getValue() != null && paymentMethodsCb.getValue().equals(PaymentMethod.CHECK)) {
+                vBox.getChildren().add(chequePaymentBox);
+            } else {
+                vBox.getChildren().remove(chequePaymentBox);
             }
         });
 
@@ -182,5 +191,9 @@ public class PaymentsController {
 
     public static CardPaymentView getCardPaymentView() {
         return cardPaymentView;
+    }
+
+    public static ChequePaymentView getChequePaymentView() {
+        return chequePaymentView;
     }
 }

@@ -93,6 +93,7 @@ public class OrderDaoImpl extends AbstractDao implements Dao<Order> {
     public void create(Order order) {
         OrderLineDaoImpl orderLineDao = new OrderLineDaoImpl();
         PaymentDaoImpl paymentDao = new PaymentDaoImpl();
+        ChequeDaoImpl chequeDao = new ChequeDaoImpl();
         PreparedStatement pstsmt;
 
         String query = "INSERT INTO orders VALUES (NULL, ?, ?, now())";
@@ -113,6 +114,9 @@ public class OrderDaoImpl extends AbstractDao implements Dao<Order> {
 
             for (Payment payment : order.getPayments()) {
                 payment.setOrder(order);
+                if(payment.getCheque() != null) {
+                    payment.getCheque().setId(chequeDao.create(payment.getCheque()));
+                }
                 paymentDao.create(payment);
             }
         } catch (SQLException e) {

@@ -303,6 +303,10 @@ public class OrdersController {
                             GUITools.openDialogOk("Erreur", null, "Une erreur s'est produite, merci de réessayer ultrièrement", Alert.AlertType.ERROR);
                             return;
                     }
+                } else if(PaymentsController.getPaymentMethodsCb().getValue().equals(PaymentMethod.CHECK)) {
+                    Cheque cheque = new Cheque(0, PaymentsController.getChequePaymentView().getOwnerField().getText(),
+                            PaymentsController.getChequePaymentView().getEffectiveDateField().getText());
+                    payments.add(new Payment(0, total, PaymentMethod.CHECK, cheque, LocalDateTime.now(), null));
                 }
                 orderDao.create(new Order(0, customersCb.getValue(), sum, LocalDateTime.now(), OrderLinesController.getOrderLinesOl(), payments));
                 OrderLinesController.getOrderLinesOl().clear();
